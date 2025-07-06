@@ -1,0 +1,266 @@
+/* src/components/Subscription/SubscriptionSection.module.css */
+
+/*
+  Variáveis de Cores e Fontes são definidas em src/app/globals.css
+  e podem ser acessadas aqui usando var(--nome-da-variavel).
+*/
+
+.subscriptionSection {
+  padding: 6rem 1.5rem;
+  background-color: var(--doodle-page-bg);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+}
+
+.subscriptionContent {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  max-width: 1100px;
+  margin: 0 auto;
+  gap: 5rem;
+  padding: 0;
+  position: relative;
+  z-index: 5; /* Garante que o conteúdo principal fique acima de qualquer fundo */
+}
+
+/* --- Responsividade --- */
+@media (max-width: 991px) { /* Tablet e Mobile */
+  .subscriptionContent {
+    flex-direction: column;
+    text-align: center;
+    gap: 3rem;
+    padding: 0;
+    max-width: 90%;
+  }
+  .subscriptionSection {
+    padding: 4rem 1rem;
+  }
+  .imagePanel {
+    padding: 0;
+  }
+}
+@media (max-width: 767px) { /* Mobile */
+  .subscriptionContent {
+    gap: 2rem;
+  }
+  .sectionTitle {
+    font-size: 2rem;
+  }
+  .sectionDescription {
+    font-size: 0.9rem;
+  }
+  .benefitsList {
+    font-size: 0.9rem;
+  }
+  /* Ajustado tamanho do ícone para mobile */
+  .benefitIcon { /* <-- Classe renomeada */
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+  .explorePlansButton {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+
+/* --- Painel Esquerdo: Imagem --- */
+.imagePanel {
+  flex-shrink: 0;
+  width: 45%;
+  max-width: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+  border-radius: 20px;
+  overflow: hidden;
+}
+@media (max-width: 991px) {
+  .imagePanel {
+    width: 70%;
+    max-width: 300px;
+    order: -1;
+  }
+}
+
+.decorativeImage {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+
+/* --- Painel Direito: Conteúdo --- */
+.textPanel {
+  flex-grow: 1;
+  max-width: 580px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+@media (max-width: 991px) {
+  .textPanel {
+    align-items: center;
+    text-align: center;
+  }
+}
+
+.sectionSubheading {
+  font-family: var(--font-mali-next);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--doodle-blue-soft); /* Cor base para o texto que não tem gradiente */
+  margin-bottom: 0.8rem;
+  line-height: 1.2;
+  display: inline-block; /* Para permitir o span interno */
+}
+/* Para centralizar em mobile */
+@media (max-width: 991px) {
+    .sectionSubheading {
+        display: block; /* Volta a ser block para centralizar facilmente */
+    }
+}
+
+/* Estilo para a palavra "imaginação" no subtítulo com degradê deslizante */
+.subheadingImaginationWord {
+    font-weight: 800;
+    background-image: linear-gradient(
+        to right,
+        var(--doodle-purple-soft),
+        var(--doodle-pink-pastel),
+        var(--doodle-blue-soft),
+        var(--doodle-green-pastel),
+        var(--doodle-yellow-mustard),
+        var(--doodle-blue-sky),
+        var(--doodle-purple-light),
+        var(--doodle-purple-soft)
+    );
+    background-size: 600% 100%;
+    background-position: 0% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent; /* Fallback */
+    display: inline-block; /* Garante que o span se comporte como um bloco inline para o background */
+    font-size: 1.8rem; /* <-- AUMENTADO: Tamanho maior para destaque */
+}
+
+
+.sectionTitle {
+  font-family: var(--font-mali-next);
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--doodle-dark-grey); /* Cor base para o texto do título */
+  margin-bottom: 1.2rem;
+  line-height: 1.1;
+}
+
+/* Estilo para a palavra "DoodleDreams" no título com degradê deslizante */
+.doodleDreamsTitleWord {
+    font-weight: 800;
+    background-image: linear-gradient(
+        to right,
+        var(--doodle-purple-soft),
+        var(--doodle-pink-pastel),
+        var(--doodle-blue-soft),
+        var(--doodle-green-pastel),
+        var(--doodle-yellow-mustard),
+        var(--doodle-blue-sky),
+        var(--doodle-purple-light),
+        var(--doodle-purple-soft)
+    );
+    background-size: 600% 100%;
+    background-position: 0% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent; /* Fallback */
+    display: inline-block; /* Essencial para propriedades de background */
+}
+
+
+.sectionDescription {
+  font-family: sans-serif;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--doodle-placeholder-text);
+  margin-bottom: 2rem;
+}
+
+.benefitsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 2.5rem;
+  text-align: left;
+  width: 100%;
+}
+@media (max-width: 991px) {
+  .benefitsList {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
+  .benefitItem {
+      justify-content: center; /* Centraliza o conteúdo do item de benefício */
+  }
+}
+
+
+.benefitItem {
+  display: flex;
+  align-items: flex-start; /* Mantém o ícone alinhado ao topo do texto */
+  gap: 0.8rem;
+  font-family: sans-serif;
+  font-size: 1rem;
+  color: var(--doodle-dark-grey);
+  margin-bottom: 0.9rem;
+}
+
+/* Estilo para o ícone de benefício (estrela) */
+.benefitIcon { /* <-- Classe renomeada */
+  color: var(--doodle-blue-soft); /* Cor da estrela */
+  width: 1.2rem;
+  height: 1.2rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  filter: drop-shadow(0 2px 3px rgba(122, 151, 204, 0.4)); /* Sombra suave */
+}
+
+.buttonWrapper {
+  display: inline-block;
+  outline: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+.explorePlansButton {
+  background-color: var(--doodle-purple-light);
+  color: var(--doodle-white);
+  font-family: var(--font-mali-next);
+  font-size: 1.15rem;
+  font-weight: 600;
+  padding: 1.1rem 2.8rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  letter-spacing: 0.025em;
+  filter: drop-shadow(0 4px 8px rgba(144, 122, 204, 0.3));
+}
+
+.explorePlansButton:hover {
+  background-color: var(--doodle-purple-soft);
+  filter: drop-shadow(0 8px 16px rgba(144, 122, 204, 0.5));
+}

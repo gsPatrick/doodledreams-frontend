@@ -1,0 +1,210 @@
+/* src/components/Footer/Footer.module.css */
+
+.footerContainer {
+  background-color: var(--doodle-page-bg); /* Usa a mesma cor de fundo da página */
+  color: var(--doodle-dark-grey);
+  padding-top: 8rem;
+  padding-bottom: 2rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* --- Separador Ondulado para Diferenciação --- */
+.wavySeparator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  /* Uma sombra sutil no separador para criar a sensação de profundidade */
+  filter: drop-shadow(0 -10px 8px rgba(0, 0, 0, 0.03));
+}
+
+.wavySeparator svg {
+  position: relative;
+  display: block;
+  width: calc(100% + 1.3px);
+  height: 120px;
+}
+
+.wavyFill {
+  /* A onda agora tem uma cor ligeiramente diferente, um lilás bem claro, para fazer a transição */
+  fill: var(--doodle-purple-light);
+  opacity: 0.2; /* Com opacidade para ser bem sutil */
+}
+
+/* --- Conteúdo Principal do Footer --- */
+.footerContent {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  /* Layout de grid para dar mais peso à primeira coluna */
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 2.5rem;
+}
+
+.footerColumn {
+  display: flex;
+  flex-direction: column;
+  /* Garante alinhamento à esquerda em telas grandes */
+  align-items: flex-start;
+}
+
+.footerLogo {
+  margin-bottom: 1rem;
+  display: inline-block; /* Garante que o link ocupe apenas o espaço da imagem */
+  transition: transform 0.3s ease;
+}
+
+.footerLogo:hover {
+  transform: scale(1.03); /* Efeito de hover na logo */
+}
+
+.logoImage {
+  object-fit: contain; /* Garante que a logo não distorça */
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); /* Pequena sombra na logo */
+}
+
+.footerDescription {
+  font-family: sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--doodle-placeholder-text);
+  margin-bottom: 1.5rem;
+}
+
+.socialIcons {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.socialIcons a {
+  color: var(--doodle-purple-light);
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.socialIcons a:hover {
+  color: var(--doodle-pink-pastel);
+  transform: translateY(-3px);
+}
+
+.footerTitle {
+  font-family: var(--font-mali-next);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--doodle-purple-soft);
+  margin-bottom: 1.5rem;
+}
+
+/* Adicionado para espaçar os títulos dentro da mesma coluna */
+.marginTop {
+  margin-top: 2rem;
+}
+
+.footerList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.footerLink {
+  font-family: sans-serif;
+  font-size: 1rem;
+  color: var(--doodle-dark-grey);
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.footerLink::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background-color: var(--doodle-pink-pastel);
+  transition: width 0.3s ease;
+}
+
+.footerLink:hover {
+  color: var(--doodle-blue-soft);
+}
+
+.footerLink:hover::after {
+  width: 100%;
+}
+
+/* Nova classe para os itens de contato */
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: sans-serif;
+  font-size: 1rem;
+  color: var(--doodle-dark-grey);
+}
+
+.contactItem svg {
+  color: var(--doodle-purple-soft);
+}
+
+
+/* --- Barra Inferior --- */
+.footerBottomBar {
+  max-width: 1280px;
+  margin: 3rem auto 0 auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(144, 122, 204, 0.2); /* Borda mais sutil */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--doodle-placeholder-text);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.developerCredit a {
+  color: var(--doodle-blue-soft);
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.developerCredit a:hover {
+  color: var(--doodle-purple-soft);
+  text-decoration: underline;
+}
+
+/* --- Responsividade Adicional --- */
+/* Para tablets */
+@media (max-width: 992px) {
+  .footerContent {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
+/* Para mobile */
+@media (max-width: 767px) {
+  .footerContent {
+    text-align: center;
+    grid-template-columns: 1fr;
+  }
+  .footerColumn {
+    align-items: center; /* Centraliza o conteúdo da coluna no mobile */
+  }
+  .footerBottomBar {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* REMOVIDO: Estilos de newsletter que não são mais necessários */
+/* .newsletterForm, .newsletterInput, .newsletterButton {...} */

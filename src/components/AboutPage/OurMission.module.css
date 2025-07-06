@@ -1,0 +1,85 @@
+.missionSection {
+  padding: 6rem 1.5rem;
+  text-align: center;
+  background-color: var(--doodle-page-bg);
+  border-top: 1px solid var(--doodle-input-border);
+}
+
+.sectionTitle {
+  font-family: var(--font-mali-next);
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--doodle-dark-grey);
+  margin-bottom: 3.5rem;
+}
+
+.missionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.missionCard {
+  background-color: var(--doodle-white);
+  padding: 2.5rem 2rem;
+  border-radius: 20px;
+  border: 1px solid var(--doodle-input-border);
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.03);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.iconWrapper {
+  font-size: 3rem;
+  color: var(--doodle-blue-soft);
+  margin-bottom: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+.missionCard:hover .iconWrapper {
+  transform: scale(1.1) rotate(-10deg);
+}
+
+.cardTitle {
+  font-family: var(--font-mali-next);
+  font-size: 1.5rem; /* Aumentado para melhor legibilidade */
+  font-weight: 700;
+  color: var(--doodle-dark-grey);
+  margin-bottom: 0.8rem;
+  min-height: 5rem; /* Garante espaço para duas linhas */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+/* A MÁGICA ACONTECE AQUI */
+.highlightWord {
+  display: inline-block;
+  font-weight: 800;
+  color: transparent; /* O texto fica transparente */
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-image: linear-gradient(
+    90deg,
+    var(--doodle-pink-pastel),
+    var(--doodle-yellow-mustard),
+    var(--doodle-blue-sky),
+    var(--doodle-green-pastel)
+  );
+  /* Animação de "pintura" */
+  background-size: 0% 100%; /* Começa sem cor */
+  background-repeat: no-repeat;
+  transition: background-size 1s ease-in-out; /* Transição suave via CSS (alternativa ao GSAP) */
+}
+
+.cardDescription {
+  font-family: sans-serif;
+  font-size: 1rem;
+  color: var(--doodle-placeholder-text);
+  line-height: 1.6;
+}

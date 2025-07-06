@@ -1,0 +1,91 @@
+/* src/components/CatalogPage/ProductGrid.module.css */
+
+.gridContainer {
+  width: 100%;
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+/* --- ESTILOS PARA MENSAGENS DE ESTADO --- */
+
+/* Container geral para mensagens de status */
+.statusContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  background-color: var(--doodle-beige-light);
+  border-radius: 16px;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+}
+
+/* Estilos para textos de carregamento e erro */
+.loadingText,
+.errorText {
+  font-family: var(--font-mali-next);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--doodle-placeholder-text);
+}
+
+.errorText {
+  color: var(--doodle-pink-pastel);
+}
+
+
+/* --- ESTILOS REFEITOS PARA A MENSAGEM DE "NENHUM RESULTADO" --- */
+
+/* Container para a mensagem */
+.noResults {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 2rem;
+  text-align: center;
+  width: 100%;
+  min-height: 400px;
+  /* Fundo e borda removidos para um visual mais limpo */
+  background-color: transparent;
+  border: none;
+}
+
+/* Título principal da mensagem (a frase) */
+.noResultsTitle {
+  font-family: var(--font-mali-next);
+  font-size: clamp(2.5rem, 6vw, 4rem); /* Grande e responsivo */
+  font-weight: 800;
+  color: var(--doodle-dark-grey);
+  line-height: 1.3;
+}
+
+/* Estilo para as palavras destacadas ("rabisco", "mágico") */
+.noResultsTitle .highlight {
+  position: relative;
+  display: inline-block;
+  color: var(--doodle-purple-soft); /* Cor do texto destacado */
+}
+
+/* Efeito de "pincelada" amarela atrás das palavras destacadas */
+.noResultsTitle .highlight::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: -5%;
+  width: 110%;
+  height: 15px; /* Altura da pincelada */
+  background-color: var(--doodle-yellow-light);
+  opacity: 0.8;
+  z-index: -1;
+  transform: skewX(-15deg) rotate(-2deg);
+}
+
+/* REMOVIDO: Estilos antigos que não são mais necessários */
+/* .noResultsIcon, .emptyMessage, .noResults p, etc. */

@@ -1,0 +1,40 @@
+.ctaSection {
+  padding: 6rem 1.5rem;
+  text-align: center;
+  background-color: var(--doodle-beige-light); /* Um fundo suave para diferenciar a seção */
+  border-top: 1px solid var(--doodle-input-border);
+}
+
+.ctaTitle {
+  font-family: var(--font-mali-next);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--doodle-dark-grey);
+  margin-bottom: 1rem;
+}
+
+.ctaDescription {
+  max-width: 600px;
+  margin: 0 auto 2.5rem auto;
+  color: var(--doodle-placeholder-text);
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.ctaButton {
+  display: inline-block; /* Para que o padding e motion funcionem bem */
+  background-color: var(--doodle-purple-light);
+  color: var(--doodle-white);
+  font-family: var(--font-mali-next);
+  font-size: 1.15rem;
+  font-weight: 600;
+  padding: 1.1rem 2.8rem;
+  border-radius: 9999px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.ctaButton:hover {
+  background-color: var(--doodle-purple-soft);
+  box-shadow: 0 8px 25px rgba(144, 122, 204, 0.4);
+}

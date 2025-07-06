@@ -1,0 +1,105 @@
+.comfortSection {
+  padding: 6rem 1.5rem;
+  background-color: var(--doodle-page-bg);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  min-height: 80vh;
+}
+
+.comfortContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.leftPanel {
+  flex: 1;
+  max-width: 600px;
+  text-align: left;
+}
+
+.sectionTitle {
+  font-family: var(--font-mali-next);
+  font-size: clamp(2.8rem, 6vw, 4rem);
+  font-weight: 800;
+  color: var(--doodle-dark-grey);
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+}
+
+.highlight {
+  color: var(--doodle-blue-soft);
+  position: relative;
+  display: inline-block;
+}
+
+.highlight::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  background-color: var(--doodle-blue-sky);
+  opacity: 0.5;
+  z-index: -1;
+  transform: skewX(-15deg);
+}
+
+.sectionSubtitle {
+  font-family: sans-serif;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--doodle-placeholder-text);
+}
+
+.rightPanel {
+  flex: 1;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1000px; /* Para a animação 3D de rotação */
+}
+
+.imageWrapper {
+  position: relative;
+  z-index: 10;
+}
+
+.bookImage {
+  width: 100%;
+  max-width: 450px;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: rotateZ(5deg); /* Inclinado para o outro lado */
+  transition: transform 0.3s ease;
+}
+
+.bookImage:hover {
+  transform: rotateZ(0deg) scale(1.03);
+}
+
+/* --- Responsividade --- */
+@media (max-width: 991px) {
+  .comfortContent {
+    flex-direction: column; /* Inverte a ordem padrão para texto vir antes */
+    text-align: center;
+    gap: 3rem;
+  }
+  .leftPanel {
+    text-align: center;
+  }
+  .highlight::after {
+    bottom: 2px;
+    height: 8px;
+  }
+  .rightPanel {
+    width: 80%;
+  }
+}

@@ -1,0 +1,77 @@
+.productCard {
+  display: flex;
+  flex-direction: column;
+  background: var(--doodle-white);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+}
+
+.productCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1/1; /* Garante que a imagem seja sempre quadrada */
+  background-color: var(--doodle-page-bg);
+}
+
+.cardImage {
+  object-fit: cover;
+}
+
+.cardInfo {
+  padding: 1rem 1.25rem;
+  /* Mudanças aqui para alinhar texto e botão */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cardText {
+  /* Este container segura o título e o preço */
+  text-align: left;
+}
+
+.cardTitle {
+  font-family: var(--font-mali-next);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--doodle-dark-grey);
+  margin-bottom: 0.25rem; /* Espaço ajustado */
+}
+
+.cardPrice {
+  font-family: sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--doodle-purple-soft);
+}
+
+/* Novo estilo para o botão de adicionar ao carrinho */
+.addToCartBtn {
+  background-color: var(--doodle-purple-soft);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  cursor: pointer;
+  flex-shrink: 0; /* Impede que o botão encolha */
+  transition: background-color 0.2s ease;
+}
+
+.addToCartBtn:hover {
+  /* O hover é controlado pela Framer Motion, mas podemos ter um fallback */
+  background-color: var(--doodle-purple-light);
+}

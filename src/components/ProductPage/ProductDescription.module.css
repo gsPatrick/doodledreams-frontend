@@ -1,0 +1,26 @@
+/* Este arquivo substitui o antigo ProductTabs.module.css */
+.descriptionContainer {
+  margin-top: 2rem;
+  grid-column: 1 / -1; /* Ocupa as duas colunas do grid */
+}
+
+.content {
+  padding: 2.5rem;
+  background: var(--doodle-white);
+  border-radius: 16px;
+  border: 1px solid var(--doodle-input-border);
+}
+
+.content h4 {
+  font-family: var(--font-mali-next);
+  font-size: 1.8rem;
+  color: var(--doodle-dark-grey);
+  margin-bottom: 1rem;
+}
+
+.content p {
+  line-height: 1.8;
+  color: var(--doodle-dark-grey);
+  font-size: 1.1rem;
+  max-width: 80ch; /* Limita a largura da linha para melhor legibilidade */
+}

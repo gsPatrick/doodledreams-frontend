@@ -1,0 +1,615 @@
+/* src/components/Header/Header.module.css */
+
+/* --- Header Wrapper (o container geral) --- */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background-color: transparent; /* GSAP controla sub-elementos */
+}
+
+/* --- Top Bar (para Desktop) --- */
+.topBarWrapper {
+  display: block; /* Visível por padrão em desktop */
+}
+@media (max-width: 767px) { /* Esconde a top bar em mobile */
+  .topBarWrapper {
+    display: none;
+  }
+}
+
+.topBar {
+  background-color: var(--doodle-dark-grey);
+  padding: 0.5rem 0;
+}
+
+.topBarContent {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem; /* text-sm */
+}
+
+.topBarContact, .topBarSocial {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.topBarLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--doodle-light-text-on-dark);
+  font-family: sans-serif;
+  transition: color 0.2s ease;
+}
+
+.topBarLink:hover {
+  color: var(--doodle-pink-pastel);
+}
+
+.topBarIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.topBarSocialLink {
+  color: var(--doodle-light-text-on-dark);
+  font-size: 1.2rem;
+  transition: color 0.2s ease;
+}
+
+.topBarSocialLink:hover {
+  color: var(--doodle-pink-pastel);
+}
+
+/* --- Main Bar (Logo, Busca, Ícones de Conta) --- */
+.mainBar {
+  background-color: var(--doodle-white);
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--doodle-input-border);
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease; /* Para GSAP */
+}
+
+.mainBarContent {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.mainLogo {
+  font-family: var(--font-mali-next);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--doodle-dark-grey);
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.mainLogo:hover {
+  color: var(--doodle-blue-soft);
+}
+
+/* Search Container (Escondido em mobile) */
+.searchContainer {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  max-width: 400px;
+  border: 1px solid var(--doodle-input-border);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin: 0 2rem;
+}
+@media (max-width: 767px) {
+  .searchContainer {
+    display: none;
+  }
+}
+
+.searchInput {
+  flex-grow: 1;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  color: var(--doodle-purple-soft);
+  background-color: transparent;
+}
+
+.searchInput::placeholder {
+  color: var(--doodle-placeholder-text);
+}
+
+.searchButton {
+  background-color: var(--doodle-purple-light);
+  color: var(--doodle-white);
+  padding: 0.75rem 1.25rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.searchButton:hover {
+  background-color: var(--doodle-blue-soft);
+}
+
+.searchIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--doodle-white);
+}
+
+/* Main Action Icons */
+.mainActionIcons {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+@media (max-width: 767px) {
+  .mainActionIcons {
+    gap: 1rem;
+  }
+}
+
+.mainActionLink {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--doodle-purple-light);
+  font-family: var(--font-mali-next);
+  font-size: 0.875rem;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.mainActionLink:hover {
+  color: var(--doodle-blue-soft);
+}
+
+.mainIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-bottom: 0.25rem;
+  color: var(--doodle-purple-light);
+  transition: color 0.2s ease;
+}
+
+/* --- NOVA CLASSE PARA ESTADO LOGADO --- */
+.loggedInUser {
+  color: var(--doodle-blue-soft); /* Muda a cor do texto "Olá, Maria" */
+}
+.loggedInUser .mainIcon {
+  color: var(--doodle-blue-soft); /* Muda a cor do ícone de pessoa */
+}
+.loggedInUser span {
+  font-weight: 600; /* Deixa o texto em negrito */
+}
+
+/* Oculta "Minha Conta" e "Favoritos" em mobile */
+.hideOnMobile {
+  display: flex; /* Padrão desktop */
+}
+@media (max-width: 767px) {
+  .hideOnMobile {
+    display: none;
+  }
+}
+
+/* Hamburger Menu Button (Visível apenas em mobile) */
+.mobileMenuButton {
+  display: none; /* Escondido por padrão em desktop */
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--doodle-dark-grey);
+  margin-left: 1rem;
+}
+@media (max-width: 767px) {
+  .mobileMenuButton {
+    display: block;
+  }
+}
+
+.hamburgerIcon {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* --- NOVAS CLASSES PARA BADGE DO CARRINHO --- */
+.cartIconWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cartBadge {
+  position: absolute;
+  top: -5px;
+  right: -8px;
+  background-color: var(--doodle-pink-pastel);
+  color: var(--doodle-white);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid var(--doodle-white);
+}
+
+/* --- Nav Bar (Links de Navegação Inferior, visível apenas em desktop) --- */
+.navBar {
+  background-color: var(--doodle-white);
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--doodle-input-border);
+  display: block;
+  transition: background-color 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease;
+}
+@media (max-width: 767px) {
+  .navBar {
+    display: none;
+  }
+}
+
+.navBarContent {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1.5rem;
+}
+
+.nav {
+  display: block;
+}
+
+.navList {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  justify-content: center;
+  gap: 2.5rem;
+}
+
+.navItem {
+  position: relative;
+}
+
+.navItemWrapper {
+  position: relative;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-mali-next);
+  font-size: 1.125rem;
+  color: var(--doodle-purple-light);
+  transition: color 0.2s ease;
+  text-decoration: none;
+  padding-bottom: 0.25rem;
+}
+
+.navLink:hover {
+  color: var(--doodle-blue-soft);
+}
+
+.navLinkDropdownIcon {
+  width: 1rem;
+  height: 1rem;
+  margin-left: 0.25rem;
+  transition: transform 0.2s ease;
+}
+.navLinkDropdownIcon.rotated {
+  transform: rotate(-180deg);
+}
+
+.navLinkUnderline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--doodle-blue-soft);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s ease-out;
+}
+
+.navItem:hover .navLinkUnderline {
+  transform: scaleX(1);
+}
+
+/* --- Catalog Dropdown Styles --- */
+.catalogDropdown {
+  position: absolute;
+  top: calc(100% + 15px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--doodle-white);
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  display: flex;
+  gap: 2.5rem;
+  min-width: 320px;
+  z-index: 100;
+  white-space: nowrap;
+}
+
+.dropdownColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdownColumnTitle {
+  font-family: var(--font-mali-next);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--doodle-purple-soft);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+
+.dropdownColumn ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdownColumn li {
+  margin-bottom: 0.6rem;
+}
+
+.dropdownLink {
+  font-family: var(--font-mali-next);
+  font-size: 1.05rem;
+  color: var(--doodle-dark-grey);
+  transition: color 0.2s ease;
+  text-decoration: none;
+  display: block;
+  padding: 0.2rem 0;
+}
+
+.dropdownLink:hover {
+  color: var(--doodle-blue-soft);
+}
+
+/* --- Off-Canvas Menu (Mobile) --- */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 55;
+}
+
+.offCanvasMenu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 80vw;
+  max-width: 320px;
+  height: 100vh;
+  background-color: var(--doodle-white);
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.2);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.menuHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.menuTitle {
+  font-family: var(--font-mali-next);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--doodle-dark-grey);
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: var(--doodle-dark-grey);
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.menuContent {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.menuNavList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menuNavItem {
+  margin-bottom: 1rem;
+}
+
+.menuNavLink {
+  font-family: var(--font-mali-next);
+  font-size: 1.25rem;
+  color: var(--doodle-purple-soft);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  transition: color 0.2s ease;
+}
+
+.menuNavLink:hover {
+  color: var(--doodle-blue-soft);
+}
+
+.menuSubMenuIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--doodle-purple-light);
+}
+
+.menuActionLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--doodle-input-border);
+}
+
+.menuActionLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mali-next);
+  font-size: 1.1rem;
+  color: var(--doodle-purple-soft);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.menuActionLink:hover {
+  color: var(--doodle-blue-soft);
+}
+
+.menuActionIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--doodle-purple-light);
+}
+
+.menuSearchContainer {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--doodle-input-border);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.menuSearchInput {
+  flex-grow: 1;
+  padding: 0.5rem 1rem;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  color: var(--doodle-purple-soft);
+  background-color: transparent;
+}
+
+.menuSearchInput::placeholder {
+  color: var(--doodle-placeholder-text);
+}
+
+.menuSearchButton {
+  background-color: var(--doodle-purple-light);
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.menuSearchButton:hover {
+  background-color: var(--doodle-blue-soft);
+}
+
+.menuContactInfo {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--doodle-input-border);
+}
+
+.menuContactLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: sans-serif;
+  font-size: 0.9rem;
+  color: var(--doodle-dark-grey);
+  text-decoration: none;
+  margin-bottom: 0.5rem;
+}
+
+.menuContactLink:hover {
+  color: var(--doodle-blue-soft);
+}
+
+.menuContactIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--doodle-purple-light);
+}
+
+.menuSocialLinks {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.menuSocialLink {
+  font-size: 1.5rem;
+  color: var(--doodle-purple-light);
+  transition: color 0.2s ease;
+}
+
+.menuSocialLink:hover {
+  color: var(--doodle-blue-soft);
+}
+/* src/components/Header/Header.module.css */
+
+/* ... (todos os outros estilos existentes) ... */
+
+/* --- Estilo para o Botão de Logout --- */
+.logoutButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--doodle-pink-pastel); /* Cor diferente para destacar a ação */
+}
+
+.logoutButton:hover {
+  color: #d9466b; /* Um rosa mais escuro no hover */
+}
+
+.logoutButton .mainIcon {
+  color: var(--doodle-pink-pastel);
+}
+
+.logoutButton:hover .mainIcon {
+  color: #d9466b;
+}
