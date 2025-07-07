@@ -1,70 +1,67 @@
 'use client';
+
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import styles from './ProductCard.module.css';
 import { motion } from 'framer-motion';
-import { BsCartPlus } from 'react-icons/bs'; // Importar o ícone do carrinho
+import styles from './ProductCard.module.css';
 
-const ProductCard = ({ product, index }) => {
-  const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: 'spring',
-        stiffness: 100,
-        damping: 12,
-        delay: index * 0.1
-      }
-    }
-  };
+const buttonColors = {
+  blue: 'var(--doodle-purple-soft)',
+  purple: 'var(--doodle-pink-pastel)',
+  hoverBlue: 'var(--doodle-purple-light)',
+  hoverPurple: 'var(--doodle-purple-soft)',
+};
 
-  // Função para lidar com a adição ao carrinho
+const ProductCard = ({ product }) => {
   const handleAddToCart = (e) => {
-    // Impede que o clique no botão ative o Link do card pai
+    e.preventDefault();
     e.stopPropagation();
-    e.preventDefault(); // Garante que o link não será seguido
-    
-    // Em um app real, você chamaria uma função de um context, etc.
-    console.log(`Produto "${product.name}" adicionado ao carrinho!`);
-    // Poderia haver um feedback visual aqui, como mudar o ícone
+    console.log(`Adicionar ${product.name} ao carrinho!`);
   };
+
+  const numericPrice = Number(product.price) || 0;
+  // Define uma cor padrão caso a prop não seja passada
+  const colorKey = product.buttonColor === 'purple' ? 'purple' : 'blue';
+  const currentButtonColor = buttonColors[colorKey];
+  const hoverButtonColor = buttonColors[`hover${colorKey.charAt(0).toUpperCase() + colorKey.slice(1)}`];
 
   return (
     <motion.div
-      variants={cardVariants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true }}
+      className={styles.productCard}
+      whileHover={{ y: -5, boxShadow: "0 15px 30px rgba(0, 0, 0, 0.1)" }}
+      transition={{ type: "spring", stiffness: 300, damping: 15 }}
     >
-      <Link href={`/product/${product.slug}`} className={styles.productCard}>
-        <div className={styles.imageWrapper}>
+      <Link href={`/product/${product.slug}`} className={styles.productLink}>
+        {product.isNew && <span className={styles.newBadge}>Novo!</span>}
+        
+        <div className={styles.productImageContainer}>
           <Image
             src={product.imageSrc}
             alt={product.name}
             fill
-            className={styles.cardImage}
+            sizes="(max-width: 600px) 100vw, (max-width: 1200px) 33vw, 20vw"
+            className={styles.productImage}
           />
         </div>
-        <div className={styles.cardInfo}>
-          <div className={styles.cardText}>
-            <h5 className={styles.cardTitle}>{product.name}</h5>
-            <p className={styles.cardPrice}>R$ {product.price.toFixed(2).replace('.', ',')}</p>
-          </div>
-          {/* Botão de adicionar ao carrinho */}
-          <motion.button
-            className={styles.addToCartBtn}
-            onClick={handleAddToCart}
-            whileHover={{ scale: 1.1, backgroundColor: 'var(--doodle-purple-light)' }}
-            whileTap={{ scale: 0.9 }}
-            aria-label={`Adicionar ${product.name} ao carrinho`}
-          >
-            <BsCartPlus />
-          </motion.button>
+
+        <div className={styles.productInfo}>
+          <h3 className={styles.productName}>{product.name}</h3>
+          <p className={styles.productPrice}>R$ {numericPrice.toFixed(2).replace('.', ',')}</p>
         </div>
       </Link>
+
+      <motion.button
+        className={styles.addToCartButton}
+        style={{ backgroundColor: currentButtonColor, borderColor: currentButtonColor }}
+        whileHover={{ backgroundColor: hoverButtonColor, borderColor: hoverButtonColor, scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        transition={{ type: "spring", stiffness: 400, damping: 10 }}
+        onClick={handleAddToCart}
+        aria-label={`Adicionar ${product.name} ao carrinho`}
+      >
+        Adicionar ao Carrinho
+      </motion.button>
     </motion.div>
   );
 };

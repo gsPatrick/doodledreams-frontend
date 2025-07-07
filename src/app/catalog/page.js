@@ -1,9 +1,6 @@
-// app/catalog/page.js
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
-// 3. ALTERAÇÃO AQUI: Importar o hook para ler parâmetros da URL
 import { useSearchParams } from 'next/navigation';
 import FilterSidebar from '@/components/CatalogPage/FilterSidebar';
 import ProductGrid from '@/components/CatalogPage/ProductGrid';
@@ -15,15 +12,11 @@ export default function CatalogPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ total: 0, totalPages: 1, currentPage: 1 });
-  
-  // 4. ALTERAÇÃO AQUI: Usar o hook para ter acesso aos parâmetros
   const searchParams = useSearchParams();
 
-  // 5. ALTERAÇÃO AQUI: Ler os parâmetros da URL para definir o estado inicial dos filtros
   const [filters, setFilters] = useState(() => {
     const categoryFromUrl = searchParams.get('category');
     const sortFromUrl = searchParams.get('sort');
-    
     return {
       categories: categoryFromUrl ? [categoryFromUrl] : [],
       price: { min: 0, max: 100 },
@@ -38,8 +31,6 @@ export default function CatalogPage() {
     };
   }, []);
 
-  // O useEffect de busca de produtos permanece o mesmo,
-  // pois ele já reage a mudanças no estado 'filters'
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true);
@@ -58,9 +49,10 @@ export default function CatalogPage() {
             id: p.id,
             slug: p.slug || p.id,
             name: p.nome,
-            price: p.variacoes.length > 0 ? p.variacoes[0].preco : 0,
-            imageSrc: p.imagens.length > 0 ? p.imagens[0] : 'https://placehold.co/400x400.png',
-            isNew: false,
+            // CORREÇÃO APLICADA: Convertendo para número
+            price: p.variacoes && p.variacoes.length > 0 ? Number(p.variacoes[0].preco) : 0.00,
+            imageSrc: p.imagens && p.imagens.length > 0 ? p.imagens[0] : 'https://placehold.co/400x400.png',
+            isNew: false, 
         }));
 
         setProducts(formattedProducts);

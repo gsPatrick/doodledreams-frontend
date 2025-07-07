@@ -304,3 +304,32 @@
         align-items: center;
     }
 }
+
+/* ... (todos os estilos existentes) ... */
+
+/* --- NOVO: Estilos para Exibição do Endereço do Usuário --- */
+.addressDisplay {
+  background-color: var(--doodle-beige-light);
+  border: 1px solid var(--doodle-input-border);
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--doodle-placeholder-text);
+}
+
+.addressDisplay p {
+  margin: 0 0 0.25rem 0;
+}
+
+.addressDisplay p strong {
+  color: var(--doodle-dark-grey);
+  font-family: var(--font-mali-next);
+}
+
+/* NOVO: Estilo para erro no cálculo de frete */
+.shippingError {
+  color: var(--doodle-pink-pastel);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}

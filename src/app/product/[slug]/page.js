@@ -1,58 +1,72 @@
-// app/product/[slug]/page.js
-
 import Breadcrumb from '@/components/SubscriptionPage/Breadcrumb';
 import ProductGallery from '@/components/ProductPage/ProductGallery';
 import ProductDetails from '@/components/ProductPage/ProductDetails';
 import ProductDescription from '@/components/ProductPage/ProductDescription';
 import RelatedProducts from '@/components/ProductPage/RelatedProducts';
-import api from '@/services/api'; // Nosso serviço de API
-import { notFound } from 'next/navigation'; // Para tratar produtos não encontrados
+import api from '@/services/api';
+import { notFound } from 'next/navigation';
 
-// Função para buscar dados da API
 async function getProductData(slug) {
   try {
-    // Busca o produto principal e os relacionados em paralelo
-    const [productRes, relatedRes] = await Promise.all([
-      api.get(`/produtos/${slug}`),
-      api.get(`/produtos/${slug}/relacionados`)
-    ]);
-
+    console.log(`[SERVER] Iniciando busca para slug: ${slug}`);
+    
+    // A Promise.all é eficiente, mas vamos separar para um debug mais claro.
+    const productRes = await api.get(`/produtos/${slug}`);
+    console.log("[SERVER] Resposta da API de produto principal recebida.");
+    
+    // Validação crucial: Se a API respondeu 200 mas sem dados, trate como não encontrado.
+    if (!productRes.data || Object.keys(productRes.data).length === 0) {
+        console.warn(`[SERVER] API retornou sucesso para o slug '${slug}', mas os dados estão vazios.`);
+        notFound();
+    }
+    
     const apiProduct = productRes.data;
-    const apiRelated = relatedRes.data;
 
-    // Mapeia os dados da API para o formato que os componentes esperam
+    // Busca de relacionados é secundária, então pode falhar sem quebrar a página.
+    let apiRelated = [];
+    try {
+        const relatedRes = await api.get(`/produtos/${apiProduct.id}/relacionados`);
+        apiRelated = relatedRes.data;
+        console.log("[SERVER] Resposta da API de produtos relacionados recebida.");
+    } catch (relatedError) {
+        console.warn(`[SERVER] Aviso: Falha ao buscar produtos relacionados para ID ${apiProduct.id}. A página será renderizada sem eles.`);
+    }
+
+    // --- FORMATAÇÃO DE DADOS SEGURA ---
+    console.log("[SERVER] Iniciando formatação dos dados...");
+    
     const product = {
       id: apiProduct.id,
-      name: apiProduct.nome,
-      images: apiProduct.imagens.map(url => ({ src: url, alt: apiProduct.nome })),
-      variations: apiProduct.variacoes.map(v => ({
+      name: apiProduct.nome || "Produto sem nome",
+      images: (apiProduct.imagens || []).map(url => ({ src: url, alt: apiProduct.nome || "Imagem do produto" })),
+      variations: (apiProduct.variacoes || []).map(v => ({
         id: v.id,
-        name: v.nome,
-        price: v.preco,
-        stock: v.estoque,
+        name: v.nome || "Variação",
+        price: Number(v.preco) || 0,
+        stock: v.estoque || 0,
       })),
-      description: apiProduct.descricao,
+      description: apiProduct.descricao || "Descrição não disponível.",
     };
 
-    const relatedProducts = apiRelated.map(p => ({
+    const relatedProducts = (apiRelated || []).map(p => ({
       id: p.id,
       slug: p.slug || p.id,
-      name: p.nome,
-      price: p.variacoes.length > 0 ? p.variacoes[0].preco : 0,
-      imageSrc: p.imagens.length > 0 ? p.imagens[0] : 'https://placehold.co/400x400.png',
-      isNew: false,
+      name: p.nome || "Produto relacionado",
+      price: p.variacoes && p.variacoes.length > 0 ? Number(p.variacoes[0].preco) : 0.00,
+      imageSrc: p.imagens && p.imagens.length > 0 ? p.imagens[0] : 'https://placehold.co/400x400.png',
     }));
 
+    console.log("[SERVER] Formatação concluída. Retornando dados para o componente.");
     return { product, relatedProducts };
 
   } catch (error) {
-    // Se a API retornar um erro (ex: 404), a página de "Não Encontrado" será renderizada
-    console.error("Erro ao buscar dados do produto:", error);
-    if (error.response && error.response.status === 404) {
-      notFound();
+    console.error(`[SERVER] ERRO CRÍTICO em getProductData para slug '${slug}':`, error.message);
+    if (error.response) {
+      console.error("[SERVER] Detalhes do erro da API:", error.response.status, error.response.data);
+      if (error.response.status === 404) {
+        notFound();
+      }
     }
-    // Para outros erros, você pode mostrar uma página de erro personalizada
-    // Por enquanto, vamos retornar nulo para que a página possa tratar
     return { product: null, relatedProducts: [] };
   }
 }
@@ -60,10 +74,19 @@ async function getProductData(slug) {
 
 export default async function ProductPage({ params }) {
   const { slug } = params;
+  
+  // O console.log inicial vai aparecer no terminal do servidor Next.js
+  console.log(`[SERVER] Renderizando a página para o slug: ${slug}`);
+
   const { product, relatedProducts } = await getProductData(slug);
 
   if (!product) {
-    return <div>Produto não encontrado ou ocorreu um erro ao carregar.</div>;
+    return (
+        <main style={{ padding: '10rem 1.5rem', textAlign: 'center' }}>
+            <h1>Oops! Rabisco não encontrado.</h1>
+            <p>Não conseguimos encontrar o produto que você está procurando. Ele pode ter se escondido!</p>
+        </main>
+    );
   }
 
   const breadcrumbItems = [
@@ -83,7 +106,6 @@ export default async function ProductPage({ params }) {
           margin: '2rem 0'
       }}>
           <ProductGallery images={product.images} />
-          {/* Passamos o produto inteiro para ProductDetails */}
           <ProductDetails product={product} /> 
           <ProductDescription product={product} /> 
       </div>

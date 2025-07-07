@@ -1,19 +1,25 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Pode haver outras configurações aqui, como reactStrictMode.
-  // Adicione ou modifique a propriedade 'images' abaixo:
+  reactStrictMode: true, // Pode manter, sem problemas.
   images: {
     remotePatterns: [
+      // Configuração para placehold.co (está correta)
       {
         protocol: 'https',
         hostname: 'placehold.co',
         port: '',
-        pathname: '/**', // Permite qualquer caminho dentro desse hostname
+        pathname: '/**',
       },
-      // Você pode adicionar outros domínios aqui no futuro, se precisar.
+      // Configuração para o seu backend (corrigida)
+      {
+        protocol: 'https',
+        hostname: 'n8n-doodledreamsbackend.r954jc.easypanel.host',
+        port: '',
+        // CORREÇÃO AQUI: Permite o acesso a /uploads/ e qualquer coisa dentro dele.
+        pathname: '/uploads/**', 
+      },
     ],
   },
 };
 
-// Use export default em vez de module.exports
 export default nextConfig;

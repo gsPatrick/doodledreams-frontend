@@ -1,0 +1,159 @@
+/* src/components/AccountPage/modals/AddressModal.module.css */
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+}
+
+.modalContainer {
+  background-color: var(--doodle-white);
+  border-radius: 20px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 550px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed var(--doodle-input-border);
+}
+
+.modalHeader h3 {
+  font-family: var(--font-mali-next);
+  font-size: 1.5rem;
+  color: var(--doodle-dark-grey);
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: var(--doodle-placeholder-text);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.closeButton:hover {
+  color: var(--doodle-dark-grey);
+}
+
+.addressForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--doodle-dark-grey);
+  margin-bottom: 0.5rem;
+}
+
+.formGroup input {
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--doodle-input-border);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+.formGroup input:focus {
+    outline: none;
+    border-color: var(--doodle-purple-soft);
+    box-shadow: 0 0 0 2px rgba(144, 122, 204, 0.2);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+
+.cepStatus {
+  font-size: 0.8rem;
+  color: var(--doodle-blue-soft);
+  margin-top: 0.25rem;
+}
+.cepError {
+  font-size: 0.8rem;
+  color: var(--doodle-pink-pastel);
+  margin-top: 0.25rem;
+}
+.formError {
+    text-align: center;
+    color: var(--doodle-pink-pastel);
+    background-color: #fce8f0;
+    padding: 0.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.checkboxGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.checkboxGroup input {
+    width: 18px;
+    height: 18px;
+}
+.checkboxGroup label {
+    font-weight: normal;
+    font-size: 1rem;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  border-top: 1px dashed var(--doodle-input-border);
+  padding-top: 1.5rem;
+}
+
+.cancelButton, .saveButton {
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    border: 1px solid;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancelButton {
+    background-color: transparent;
+    border-color: var(--doodle-input-border);
+    color: var(--doodle-placeholder-text);
+}
+.cancelButton:hover {
+    background-color: var(--doodle-beige-light);
+}
+
+.saveButton {
+    background-color: var(--doodle-purple-soft);
+    border-color: var(--doodle-purple-soft);
+    color: white;
+}
+.saveButton:disabled {
+    background-color: var(--doodle-placeholder-text);
+    border-color: var(--doodle-placeholder-text);
+    cursor: not-allowed;
+}

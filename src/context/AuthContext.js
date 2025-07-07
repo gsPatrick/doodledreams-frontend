@@ -1,3 +1,5 @@
+// context/AuthContext.js
+
 'use client';
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
@@ -8,35 +10,37 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // Para saber quando a verificação inicial terminou
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    // Ao carregar a aplicação, verifica se há dados no localStorage
-    try {
-      const storedToken = localStorage.getItem('doodle_token');
-      const storedUser = localStorage.getItem('doodle_user');
-      
-      if (storedToken && storedUser) {
-        setToken(storedToken);
-        setUser(JSON.parse(storedUser));
+    // A verificação já está dentro do useEffect, que só roda no cliente,
+    // mas adicionar a verificação explícita é uma boa prática.
+    if (typeof window !== 'undefined') {
+      try {
+        const storedToken = localStorage.getItem('doodle_token');
+        const storedUser = localStorage.getItem('doodle_user');
+        
+        if (storedToken && storedUser) {
+          setToken(storedToken);
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (error) {
+        console.error("Falha ao carregar dados de autenticação do localStorage", error);
+        localStorage.removeItem('doodle_token');
+        localStorage.removeItem('doodle_user');
       }
-    } catch (error) {
-      console.error("Falha ao carregar dados de autenticação do localStorage", error);
-      // Limpa em caso de erro (ex: JSON inválido)
-      localStorage.removeItem('doodle_token');
-      localStorage.removeItem('doodle_user');
-    } finally {
-      setIsLoading(false);
     }
+    setIsLoading(false); // Move para fora do if para garantir que sempre seja definido
   }, []);
 
   const login = (userData, authToken) => {
+    // localStorage só será acessado aqui no cliente, o que é seguro.
     localStorage.setItem('doodle_token', authToken);
     localStorage.setItem('doodle_user', JSON.stringify(userData));
     setToken(authToken);
     setUser(userData);
-    router.push('/my-account'); // Redireciona para a página da conta após o login
+    router.push('/my-account');
   };
 
   const logout = () => {
@@ -44,7 +48,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('doodle_user');
     setToken(null);
     setUser(null);
-    router.push('/auth'); // Redireciona para a página de login após o logout
+    router.push('/auth');
   };
 
   const value = {
