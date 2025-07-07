@@ -299,3 +299,55 @@
   background-color: #f8d7da;
   color: #721c24;
 }
+
+
+/* src/components/AccountPage/AccountPage.module.css */
+
+/* ... seus estilos existentes ... */
+
+/* --- ESTILOS PARA DOWNLOADS DIGITAIS --- */
+/* ... (seus estilos existentes para .downloadList, .downloadCard, .downloadImage, .downloadInfo, .downloadInfo h4, .downloadInfo p) ... */
+
+/* NOVO: Container para múltiplos botões de download */
+.downloadActions {
+  display: flex;
+  gap: 0.5rem; /* Espaço entre os botões */
+  flex-wrap: wrap; /* Quebra linha se muitos botões */
+  justify-content: flex-end; /* Alinha à direita */
+  flex-shrink: 0;
+}
+
+.downloadButton { /* Reutiliza o estilo existente, apenas garante que esteja dentro do downloadActions */
+  flex-shrink: 0;
+  background-color: var(--doodle-purple-soft);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px; /* Tamanho ligeiramente menor se forem múltiplos */
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem; /* Tamanho do ícone ajustado */
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(144, 122, 204, 0.3);
+  transition: all 0.2s ease;
+}
+.downloadButton:hover {
+    scale: 1.1;
+    filter: brightness(1.1);
+}
+.downloadButton:active {
+    scale: 0.95;
+}
+
+
+/* NOVO: Estilo para a mensagem de "sem arquivos" */
+.infoTextSmall {
+    font-size: 0.85rem;
+    color: var(--doodle-placeholder-text);
+    font-style: italic;
+}
+
+
+/* ... (restante dos estilos existentes) ... */

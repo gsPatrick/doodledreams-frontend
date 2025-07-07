@@ -1,45 +1,45 @@
+// src/app/cart/page.js
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
-import { useAuth } from '@/context/AuthContext'; // 1. Importar o hook de autenticação
+import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import Breadcrumb from '@/components/SubscriptionPage/Breadcrumb';
 import CartItemList from '@/components/CartPage/CartItemList';
 import CartSummary from '@/components/CartPage/CartSummary';
 import styles from '@/components/CartPage/CartPage.module.css';
 import { BsEmojiFrown } from 'react-icons/bs';
-import api from '@/services/api'; // 2. Importar nossa API
+import api from '@/services/api';
 
 export default function CartPage() {
   const { cartItems } = useCart();
-  const { isAuthenticated, isAuthLoading } = useAuth(); // 3. Obter status de autenticação
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
 
-  // 4. Estado para armazenar o endereço principal do usuário
-  const [primaryAddress, setPrimaryAddress] = useState(null);
-  const [isLoadingAddress, setIsLoadingAddress] = useState(true);
+  // Estado para armazenar *todos* os endereços do usuário
+  const [userAddresses, setUserAddresses] = useState([]);
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
 
-  // 5. Efeito para buscar os endereços se o usuário estiver logado
+  // Efeito para buscar os endereços se o usuário estiver logado
   useEffect(() => {
-    // Só executa quando a verificação de autenticação terminar
-    if (!isAuthLoading) {
+    if (!isAuthLoading) { // Garante que a autenticação já foi verificada
       if (isAuthenticated) {
         api.get('/enderecos')
           .then(response => {
-            const addresses = response.data;
-            // Encontra o endereço principal ou pega o primeiro da lista
-            const mainAddress = addresses.find(addr => addr.principal) || (addresses.length > 0 ? addresses[0] : null);
-            setPrimaryAddress(mainAddress);
+            setUserAddresses(response.data || []);
           })
           .catch(error => {
             console.error("Erro ao buscar endereços:", error);
+            // Pode exibir uma mensagem de erro na UI, ou fallback para entrada manual
           })
           .finally(() => {
-            setIsLoadingAddress(false);
+            setIsLoadingAddresses(false);
           });
       } else {
-        // Se não está autenticado, não há endereço para carregar
-        setIsLoadingAddress(false);
+        // Se não está autenticado, não há endereços para carregar
+        setUserAddresses([]);
+        setIsLoadingAddresses(false);
       }
     }
   }, [isAuthenticated, isAuthLoading]);
@@ -75,8 +75,11 @@ export default function CartPage() {
           <CartItemList />
         </div>
         <div className={styles.cartSummaryColumn}>
-          {/* 6. Passar o endereço e o estado de carregamento para o CartSummary */}
-          <CartSummary userAddress={primaryAddress} isLoadingAddress={isLoadingAddress} />
+          {/* Passar todos os endereços e o estado de carregamento */}
+          <CartSummary 
+            allUserAddresses={userAddresses} 
+            isLoadingAddresses={isLoadingAddresses} 
+          />
         </div>
       </div>
     </main>

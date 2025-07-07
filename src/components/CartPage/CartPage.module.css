@@ -333,3 +333,160 @@
   font-size: 0.9rem;
   margin-top: 0.5rem;
 }
+
+/* src/components/CartPage/CartPage.module.css */
+
+/* ... (seus estilos existentes) ... */
+
+/* --- NOVO: Estilos para seleção de Endereço/CEP no Resumo --- */
+.formGroup {
+  margin-bottom: 1rem;
+}
+.formGroup label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--doodle-dark-grey);
+}
+.selectInput,
+.textInput {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--doodle-input-border);
+  font-size: 1rem;
+  background-color: var(--doodle-white);
+  color: var(--doodle-dark-grey);
+}
+.selectInput:focus,
+.textInput:focus {
+  outline: none;
+  border-color: var(--doodle-purple-soft);
+  box-shadow: 0 0 0 2px rgba(144, 122, 204, 0.2);
+}
+.textInput::placeholder {
+  color: var(--doodle-placeholder-text);
+}
+
+.cepStatus {
+  font-size: 0.85rem;
+  color: var(--doodle-blue-soft);
+  margin-top: 0.5rem;
+}
+
+/* --- NOVO: Estilos para Lista de Opções de Frete --- */
+.shippingOptionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  max-height: 200px; /* Limita a altura e adiciona scroll se muitos métodos */
+  overflow-y: auto;
+  padding-right: 0.5rem; /* Espaço para o scrollbar */
+}
+
+.shippingOptionCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.2rem;
+  border: 2px solid var(--doodle-input-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: var(--doodle-white);
+  position: relative;
+}
+
+.shippingOptionCard:hover {
+  border-color: var(--doodle-purple-light);
+  background-color: var(--doodle-beige-light);
+}
+
+.shippingOptionCard input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--doodle-input-border);
+  margin-right: 1rem;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.shippingOptionCard input[type="radio"]:checked {
+  border-color: var(--doodle-purple-soft);
+  background-color: var(--doodle-purple-soft);
+}
+
+.shippingOptionCard input[type="radio"]:checked::before {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.shippingOptionDetails {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.shippingOptionName {
+  font-family: var(--font-mali-next);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--doodle-dark-grey);
+  margin-bottom: 0.2rem;
+}
+
+.shippingOptionTime,
+.shippingOptionDesc {
+  font-size: 0.9rem;
+  color: var(--doodle-placeholder-text);
+}
+
+.shippingOptionPrice {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--doodle-purple-soft);
+  flex-shrink: 0;
+}
+
+/* Informações extras */
+.infoText {
+  font-size: 0.95rem;
+  color: var(--doodle-placeholder-text);
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background-color: var(--doodle-beige-light);
+  border-radius: 8px;
+  border: 1px solid var(--doodle-input-border);
+}
+
+/* NOVO: Estilo para erro no cálculo de frete */
+.shippingError {
+  color: var(--doodle-pink-pastel);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.loadingText {
+  font-family: var(--font-mali-next);
+  font-size: 1rem;
+  color: var(--doodle-placeholder-text);
+  text-align: center;
+  margin-top: 1rem;
+}
+
+/* ... (o restante dos seus estilos) ... */

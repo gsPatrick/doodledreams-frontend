@@ -96,3 +96,202 @@
     .stepIndicatorContainer { display: none; }
     .paymentMethodSelector { flex-direction: column; }
 }
+
+/* src/components/CheckoutPage/CheckoutPage.module.css */
+
+/* ... seus estilos existentes ... */
+
+/* Adicionar ou ajustar estilos para os novos elementos e estados */
+
+/* Estilos para mensagens de erro e sucesso */
+.errorMessage, .successMessage {
+  text-align: center;
+  padding: 0.8rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+.errorMessage {
+  background-color: #fce8f0; /* Rosa claro */
+  color: #d9466b; /* Rosa escuro */
+}
+.successMessage {
+  background-color: #e0f8e4; /* Verde claro */
+  color: #1e6a25; /* Verde escuro */
+}
+
+/* Estilo para campo de CEP manual */
+.inputWithButton {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+.inputWithButton input {
+    flex-grow: 1;
+}
+.inputWithButton button {
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    background-color: var(--doodle-blue-soft);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+     transition: background-color 0.2s ease;
+}
+.inputWithButton button:hover {
+   background-color: var(--doodle-blue-dark);
+}
+.inputWithButton button:disabled {
+    background-color: var(--doodle-placeholder-text);
+    cursor: not-allowed;
+}
+
+
+/* Estilos para a lista de opções de frete no Checkout */
+.shippingOptions { /* Reutilizando o nome da classe, mas o layout pode ser ligeiramente diferente do carrinho */
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  /* Altura máxima e overflow se necessário */
+  max-height: 250px; /* Ajuste conforme sua UI */
+  overflow-y: auto;
+  padding-right: 0.5rem; /* Espaço para scrollbar */
+}
+
+.shippingOption { /* Estilo para cada opção de frete */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.2rem;
+  border: 2px solid var(--doodle-input-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: var(--doodle-white);
+  position: relative;
+}
+
+.shippingOption.selected {
+  border-color: var(--doodle-purple-soft);
+  background-color: #f3f0f9; /* Roxo claro sutil */
+}
+
+.shippingOption input[type="radio"] {
+  /* Esconder radio button padrão e usar um customizado se necessário */
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--doodle-input-border);
+  margin-right: 1rem;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.shippingOption input[type="radio"]:checked {
+  border-color: var(--doodle-purple-soft);
+  background-color: var(--doodle-purple-soft);
+}
+
+.shippingOption input[type="radio"]:checked::before {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.shippingDetails {
+  flex-grow: 1;
+  display: flex;
+  align-items: center; /* Alinhar ícone e texto */
+  gap: 1rem;
+}
+
+.shippingDetails svg {
+    font-size: 1.5rem;
+    color: var(--doodle-purple-soft);
+}
+
+.shippingDetails p {
+  margin: 0;
+  font-weight: 600;
+  color: var(--doodle-dark-grey);
+}
+
+.shippingDetails span {
+  font-size: 0.9rem;
+  color: var(--doodle-placeholder-text);
+  display: block; /* Nova linha para prazo/descrição */
+  margin-top: 0.2em;
+}
+.shippingOptionDesc {
+    font-style: italic;
+}
+
+
+.shippingPrice {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--doodle-purple-soft);
+  flex-shrink: 0; /* Impede que o preço encolha */
+}
+
+/* Adicionar estilos para o selector de endereço (se não existirem) */
+.selectInput {
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid var(--doodle-input-border);
+    font-size: 1rem;
+}
+
+/* Estilo para checkbox group (principal) */
+.checkboxGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+.checkboxGroup input[type="checkbox"] { /* Estilo customizado se necessário */
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--doodle-input-border);
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+}
+.checkboxGroup input[type="checkbox"]:checked {
+     background-color: var(--doodle-purple-soft);
+     border-color: var(--doodle-purple-soft);
+}
+.checkboxGroup input[type="checkbox"]:checked::before {
+    content: '✔';
+    font-size: 14px;
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.checkboxGroup label {
+    font-weight: normal; /* Não negrito */
+    font-size: 1rem;
+    color: var(--doodle-dark-grey);
+    cursor: pointer;
+    margin-bottom: 0; /* Remove margem inferior */
+}
+
+/* ... (o restante dos seus estilos) ... */
