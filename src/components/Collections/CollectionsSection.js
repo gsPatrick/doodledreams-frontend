@@ -26,7 +26,6 @@ const CollectionsSection = () => {
   const titleRef = useRef(null);
   const subtitleRef = useRef(null);
 
-  // CORREÇÃO: Usando gsap.context() para gerenciar as animações de forma segura
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.fromTo(
@@ -40,13 +39,13 @@ const CollectionsSection = () => {
           stagger: 0.2,
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top 80%",
+            // CORREÇÃO: Ponto de início mais baixo para garantir que funcione no mobile
+            start: "top 90%",
             toggleActions: "play none none none",
           },
         }
       );
 
-      // Animação dos cards usando uma classe como seletor
       gsap.fromTo(
         ".collection-card-animate", 
         { opacity: 0, y: 80, scale: 0.9 },
@@ -59,13 +58,13 @@ const CollectionsSection = () => {
           stagger: 0.15,
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top 70%",
+            // CORREÇÃO: Ponto de início mais baixo também para os cards
+            start: "top 85%",
             toggleActions: "play none none none",
           },
         }
       );
 
-      // Animação dos elementos decorativos
       gsap.to(`.${styles.decorativeElement}`, {
         y: "random(-20, 20)",
         x: "random(-15, 15)",
@@ -79,9 +78,8 @@ const CollectionsSection = () => {
         delay: "random(0, 2)",
       });
 
-    }, sectionRef); // Escopo do contexto para o elemento principal
+    }, sectionRef);
 
-    // Função de limpeza que reverte todas as animações do contexto
     return () => ctx.revert();
   }, []);
 
@@ -96,7 +94,6 @@ const CollectionsSection = () => {
 
       <div className={styles.collectionsGrid}>
         {collectionData.map((collection) => (
-          // CORREÇÃO: Adicionada classe para a animação do GSAP
           <motion.div
             key={collection.id}
             className={`${styles.collectionCard} collection-card-animate`}

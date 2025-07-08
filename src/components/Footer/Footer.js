@@ -17,11 +17,9 @@ if (typeof window !== 'undefined') {
 const Footer = () => {
   const footerRef = useRef(null);
   
-  // CORREÇÃO: Usando gsap.context para um gerenciamento seguro das animações.
   useEffect(() => {
-    // Cria um contexto GSAP para encapsular as animações
     const ctx = gsap.context(() => {
-      // Animação de entrada do footer inteiro quando ele entra na viewport
+      // Animação de entrada do footer inteiro
       gsap.fromTo(
         footerRef.current,
         { y: 100, opacity: 0 },
@@ -32,15 +30,16 @@ const Footer = () => {
           ease: 'power3.out',
           scrollTrigger: {
             trigger: footerRef.current,
-            start: 'top 95%',
+            // CORREÇÃO DEFINITIVA: Gatilho que dispara quando o topo do elemento toca a base da tela.
+            start: 'top bottom', 
             toggleActions: 'play none none none',
           },
         }
       );
 
-      // Animação escalonada para as colunas do footer
+      // Animação escalonada para as colunas
       gsap.fromTo(
-        ".footer-column-animate", // Usa uma classe para selecionar as colunas
+        ".footer-column-animate",
         { y: 30, opacity: 0 },
         {
           y: 0,
@@ -50,16 +49,16 @@ const Footer = () => {
           ease: 'power2.out',
           scrollTrigger: {
             trigger: footerRef.current,
-            start: 'top 90%',
+            // CORREÇÃO DEFINITIVA: Usa o mesmo gatilho robusto.
+            start: 'top bottom', 
             toggleActions: 'play none none none',
           },
         }
       );
-    }, footerRef); // Escopo do contexto para o elemento principal do footer
+    }, footerRef);
 
-    // Função de limpeza: reverte todas as animações dentro do contexto quando o componente é desmontado
     return () => ctx.revert(); 
-  }, []); // O array de dependências vazio garante que isso rode apenas uma vez
+  }, []);
 
   return (
     <footer ref={footerRef} className={styles.footerContainer}>
@@ -70,7 +69,6 @@ const Footer = () => {
       </div>
 
       <div className={styles.footerContent}>
-        {/* CORREÇÃO: Adicionada classe para animação */}
         <div className={`${styles.footerColumn} footer-column-animate`}>
           <Link href="/" className={styles.footerLogo}>
             <Image src="/imagens/logo.svg" alt="DoodleDreams Logo" width={180} height={180} className={styles.logoImage} />

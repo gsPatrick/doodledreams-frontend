@@ -8,12 +8,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 
 import styles from './SubscriptionSection.module.css';
+import { BsStarFill } from 'react-icons/bs';
 
-// Ícone de estrela da biblioteca react-icons/bs
-// Certifique-se de ter 'react-icons' instalado
-import { BsStarFill } from 'react-icons/bs'; // <-- Ícone alterado para estrela
-
-// Registra o ScrollTrigger no GSAP
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -23,83 +19,79 @@ const SubscriptionSection = () => {
   const imagePanelRef = useRef(null);
   const textPanelRef = useRef(null);
   const subheadingRef = useRef(null);
-  const subheadingImaginationRef = useRef(null); // Ref para a palavra "imaginação" no subtítulo
-  const titleRef = useRef(null); // Ref para o container do título <h2>
-  const doodleDreamsTitleRef = useRef(null); // Nova Ref para a palavra "DoodleDreams" no título
+  const subheadingImaginationRef = useRef(null);
+  const titleRef = useRef(null);
+  const doodleDreamsTitleRef = useRef(null);
   const descriptionRef = useRef(null);
   const benefitsRef = useRef([]);
   const buttonRef = useRef(null);
 
   useEffect(() => {
-    // REMOVIDO: Animação de entrada da imagem da esquerda com um pop sutil
-    // REMOVIDO: Animação de flutuação sutil para a imagem dentro do painel
+    // CORREÇÃO: Usando gsap.context para um gerenciamento seguro das animações.
+    const ctx = gsap.context(() => {
+      const textElements = [
+        subheadingRef.current,
+        titleRef.current,
+        descriptionRef.current,
+        ...benefitsRef.current.filter(Boolean),
+        buttonRef.current,
+      ];
 
-    // Animação de entrada do conteúdo do painel direito (subtítulo, título, descrição, benefícios, botão)
-    // Nota: As animações de gradiente para as palavras específicas serão adicionadas separadamente
-    const textElements = [
-      subheadingRef.current, // O container do subtítulo
-      titleRef.current, // O container do título <h2>
-      descriptionRef.current,
-      ...benefitsRef.current.filter(Boolean),
-      buttonRef.current,
-    ];
+      gsap.fromTo(
+        textElements,
+        { y: 30, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.7,
+          ease: "power2.out",
+          stagger: 0.1,
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            // CORREÇÃO: Ponto de início mais baixo para garantir que funcione no mobile
+            start: "top 85%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
 
-    gsap.fromTo(
-      textElements,
-      { y: 30, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.7,
-        ease: "power2.out",
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 70%",
-          toggleActions: "play none none none",
-        },
-      }
-    );
-
-     // Animação da palavra "imaginação" no subtítulo com degradê deslizante
-     if (subheadingImaginationRef.current) {
+      if (subheadingImaginationRef.current) {
         gsap.to(subheadingImaginationRef.current, {
             backgroundPosition: '100% 0',
             duration: 10,
             ease: "linear",
             repeat: -1,
             yoyo: true,
-            // Começa após a animação de entrada do subtítulo ter um tempo
             delay: 1.5,
              scrollTrigger: {
-                trigger: subheadingImaginationRef.current, // Gatilho na própria palavra
-                start: "top 90%", // Começa quando a palavra entra na view
+                trigger: subheadingImaginationRef.current,
+                start: "top 90%",
                 toggleActions: "play none none none",
             },
         });
-    }
+      }
 
-    // Animação da palavra "DoodleDreams" no título com degradê deslizante
-    if (doodleDreamsTitleRef.current) {
+      if (doodleDreamsTitleRef.current) {
         gsap.to(doodleDreamsTitleRef.current, {
             backgroundPosition: '100% 0',
-            duration: 10, // Mesma duração
+            duration: 10,
             ease: "linear",
             repeat: -1,
             yoyo: true,
-            delay: 1.8, // Pouco depois do subtítulo
+            delay: 1.8,
             scrollTrigger: {
-                trigger: doodleDreamsTitleRef.current, // Gatilho na própria palavra
-                start: "top 90%", // Quando ela entra na view
+                trigger: doodleDreamsTitleRef.current,
+                start: "top 90%",
                 toggleActions: "play none none none",
             },
         });
-    }
+      }
+    }, sectionRef); // Escopo do contexto
 
-
+    // Função de limpeza
+    return () => ctx.revert();
   }, []);
 
-  // Itens de benefício melhorados
   const benefits = [
     'Livros de colorir temáticos e exclusivos',
     'Materiais de arte selecionados a dedo',
@@ -111,7 +103,6 @@ const SubscriptionSection = () => {
   return (
     <section ref={sectionRef} className={styles.subscriptionSection}>
       <div className={styles.subscriptionContent}>
-        {/* Painel Esquerdo: Imagem Decorativa (sem animação de entrada/flutuação) */}
         <div ref={imagePanelRef} className={styles.imagePanel}>
           <Image
             src="/imagens/pinte-sonhos.jpg"
@@ -123,13 +114,10 @@ const SubscriptionSection = () => {
           />
         </div>
 
-        {/* Painel Direito: Conteúdo do Clube de Assinatura */}
         <div ref={textPanelRef} className={styles.textPanel}>
-          {/* Subtítulo com a palavra "imaginação" animada */}
           <p ref={subheadingRef} className={styles.sectionSubheading}>
             Entre em um mundo de cores e <span ref={subheadingImaginationRef} className={styles.subheadingImaginationWord}>imaginação</span>!
           </p>
-          {/* Título com a palavra "DoodleDreams" animada */}
           <h2 ref={titleRef} className={styles.sectionTitle}>
             Clube de Assinatura <span ref={doodleDreamsTitleRef} className={styles.doodleDreamsTitleWord}>DoodleDreams</span>
           </h2>
@@ -157,8 +145,7 @@ const SubscriptionSection = () => {
                   viewport={{ once: true, amount: 0.5 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10, delay: 0.2 + index * 0.15 }}
                 >
-                  {/* Ícone de estrela */}
-                  <BsStarFill className={styles.benefitIcon} /> {/* <-- Classe renomeada e ícone alterado */}
+                  <BsStarFill className={styles.benefitIcon} />
                 </motion.div>
                 <span>{benefit}</span>
               </motion.li>
