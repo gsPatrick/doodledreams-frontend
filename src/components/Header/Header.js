@@ -99,6 +99,7 @@ const Header = () => {
     },
     { name: 'Assinatura', href: '/subscription' },
     { name: 'Sobre Nós', href: '/about' },
+    {name: 'Contato', href: '/contact'}
   ];
   
   const mobileNavLinks = [
@@ -106,6 +107,7 @@ const Header = () => {
     { name: 'Catálogo', href: '/catalog' },
     { name: 'Assinatura', href: '/subscription' },
     { name: 'Sobre Nós', href: '/about' },
+    {name: 'Contato', href: '/contact'}
   ];
 
   return (
