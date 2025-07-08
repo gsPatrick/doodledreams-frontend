@@ -1,75 +1,54 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react'; // Removido useEffect e useRef
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
+// import gsap from 'gsap'; // Removido GSAP
+// import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'; // Removido ScrollTrigger
 
 import styles from './Footer.module.css';
 import { FaInstagram, FaFacebookF, FaPinterestP, FaTwitter, FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
 
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
+// Animação com Framer Motion
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2, // Anima cada coluna com um atraso
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 50, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { duration: 0.8, ease: 'easeOut' },
+  },
+};
+
 
 const Footer = () => {
-  const footerRef = useRef(null);
-  
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Animação de entrada do footer inteiro
-      gsap.fromTo(
-        footerRef.current,
-        { y: 100, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1.2,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: footerRef.current,
-            // CORREÇÃO DEFINITIVA: Gatilho que dispara quando o topo do elemento toca a base da tela.
-            start: 'top bottom', 
-            toggleActions: 'play none none none',
-          },
-        }
-      );
-
-      // Animação escalonada para as colunas
-      gsap.fromTo(
-        ".footer-column-animate",
-        { y: 30, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          stagger: 0.15,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: footerRef.current,
-            // CORREÇÃO DEFINITIVA: Usa o mesmo gatilho robusto.
-            start: 'top bottom', 
-            toggleActions: 'play none none none',
-          },
-        }
-      );
-    }, footerRef);
-
-    return () => ctx.revert(); 
-  }, []);
-
   return (
-    <footer ref={footerRef} className={styles.footerContainer}>
+    // O container principal agora controla a animação
+    <motion.footer 
+      className={styles.footerContainer}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }} // Anima quando 20% do footer estiver visível
+      variants={{ visible: { opacity: 1, y: 0, transition: {duration: 0.5} }, hidden: { opacity: 0, y: 50 } }}
+    >
       <div className={styles.wavySeparator}>
         <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
           <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" className={styles.wavyFill}></path>
         </svg>
       </div>
 
-      <div className={styles.footerContent}>
-        <div className={`${styles.footerColumn} footer-column-animate`}>
+      <motion.div className={styles.footerContent} variants={containerVariants}>
+        <motion.div className={styles.footerColumn} variants={itemVariants}>
           <Link href="/" className={styles.footerLogo}>
             <Image src="/imagens/logo.svg" alt="DoodleDreams Logo" width={180} height={180} className={styles.logoImage} />
           </Link>
@@ -82,9 +61,9 @@ const Footer = () => {
             <motion.a href="#" target="_blank" rel="noopener noreferrer" whileHover={{ scale: 1.1, y: -3 }}><FaPinterestP /></motion.a>
             <motion.a href="#" target="_blank" rel="noopener noreferrer" whileHover={{ scale: 1.1, y: -3 }}><FaTwitter /></motion.a>
           </div>
-        </div>
+        </motion.div>
 
-        <div className={`${styles.footerColumn} footer-column-animate`}>
+        <motion.div className={styles.footerColumn} variants={itemVariants}>
           <h3 className={styles.footerTitle}>Navegação</h3>
           <ul className={styles.footerList}>
             <li><Link href="/" className={styles.footerLink}>Home</Link></li>
@@ -93,9 +72,9 @@ const Footer = () => {
             <li><Link href="/about" className={styles.footerLink}>Sobre Nós</Link></li>
             <li><Link href="/contact" className={styles.footerLink}>Contato</Link></li>
           </ul>
-        </div>
+        </motion.div>
 
-        <div className={`${styles.footerColumn} footer-column-animate`}>
+        <motion.div className={styles.footerColumn} variants={itemVariants}>
           <h3 className={styles.footerTitle}>Categorias</h3>
           <ul className={styles.footerList}>
             <li><Link href="/category/infantil" className={styles.footerLink}>Infantil</Link></li>
@@ -104,9 +83,9 @@ const Footer = () => {
             <li><Link href="/category/mais-vendidos" className={styles.footerLink}>Mais Vendidos</Link></li>
             <li><Link href="/category/lancamentos" className={styles.footerLink}>Lançamentos</Link></li>
           </ul>
-        </div>
+        </motion.div>
 
-        <div className={`${styles.footerColumn} footer-column-animate`}>
+        <motion.div className={styles.footerColumn} variants={itemVariants}>
           <h3 className={styles.footerTitle}>Ajuda</h3>
           <ul className={styles.footerList}>
             <li><Link href="/how-to-buy" className={styles.footerLink}>Como Comprar</Link></li>
@@ -121,8 +100,8 @@ const Footer = () => {
             <li className={styles.contactItem}><FaPhoneAlt /><span>(11) 95472-8628</span></li>
             <li className={styles.contactItem}><FaEnvelope /><span>contato@doodledreams.com.br</span></li>
           </ul>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       <div className={styles.footerBottomBar}>
         <span>© {new Date().getFullYear()} DoodleDreams. Todos os direitos reservados.</span>
@@ -130,7 +109,7 @@ const Footer = () => {
           Desenvolvido por <a href="https://codebypatrick.dev" target="_blank" rel="noopener noreferrer">Patrick.Developer</a>
         </span>
       </div>
-    </footer>
+    </motion.footer>
   );
 };
 

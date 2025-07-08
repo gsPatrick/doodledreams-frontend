@@ -1,97 +1,38 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react'; // Removido useEffect
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
+// import gsap from 'gsap'; // Removido GSAP
+// import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'; // Removido ScrollTrigger
 
 import styles from './SubscriptionSection.module.css';
 import { BsStarFill } from 'react-icons/bs';
 
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
+// Animação com Framer Motion
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15, // Anima cada filho com um pequeno atraso
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 30, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { type: 'spring', stiffness: 100 },
+  },
+};
+
 
 const SubscriptionSection = () => {
-  const sectionRef = useRef(null);
-  const imagePanelRef = useRef(null);
-  const textPanelRef = useRef(null);
-  const subheadingRef = useRef(null);
-  const subheadingImaginationRef = useRef(null);
-  const titleRef = useRef(null);
-  const doodleDreamsTitleRef = useRef(null);
-  const descriptionRef = useRef(null);
-  const benefitsRef = useRef([]);
-  const buttonRef = useRef(null);
-
-  useEffect(() => {
-    // CORREÇÃO: Usando gsap.context para um gerenciamento seguro das animações.
-    const ctx = gsap.context(() => {
-      const textElements = [
-        subheadingRef.current,
-        titleRef.current,
-        descriptionRef.current,
-        ...benefitsRef.current.filter(Boolean),
-        buttonRef.current,
-      ];
-
-      gsap.fromTo(
-        textElements,
-        { y: 30, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.7,
-          ease: "power2.out",
-          stagger: 0.1,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            // CORREÇÃO: Ponto de início mais baixo para garantir que funcione no mobile
-            start: "top 85%",
-            toggleActions: "play none none none",
-          },
-        }
-      );
-
-      if (subheadingImaginationRef.current) {
-        gsap.to(subheadingImaginationRef.current, {
-            backgroundPosition: '100% 0',
-            duration: 10,
-            ease: "linear",
-            repeat: -1,
-            yoyo: true,
-            delay: 1.5,
-             scrollTrigger: {
-                trigger: subheadingImaginationRef.current,
-                start: "top 90%",
-                toggleActions: "play none none none",
-            },
-        });
-      }
-
-      if (doodleDreamsTitleRef.current) {
-        gsap.to(doodleDreamsTitleRef.current, {
-            backgroundPosition: '100% 0',
-            duration: 10,
-            ease: "linear",
-            repeat: -1,
-            yoyo: true,
-            delay: 1.8,
-            scrollTrigger: {
-                trigger: doodleDreamsTitleRef.current,
-                start: "top 90%",
-                toggleActions: "play none none none",
-            },
-        });
-      }
-    }, sectionRef); // Escopo do contexto
-
-    // Função de limpeza
-    return () => ctx.revert();
-  }, []);
-
   const benefits = [
     'Livros de colorir temáticos e exclusivos',
     'Materiais de arte selecionados a dedo',
@@ -101,9 +42,16 @@ const SubscriptionSection = () => {
   ];
 
   return (
-    <section ref={sectionRef} className={styles.subscriptionSection}>
+    // Seção principal agora é um componente de movimento
+    <motion.section 
+      className={styles.subscriptionSection}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }} // A animação roda uma vez quando 30% está visível
+      variants={containerVariants}
+    >
       <div className={styles.subscriptionContent}>
-        <div ref={imagePanelRef} className={styles.imagePanel}>
+        <motion.div className={styles.imagePanel} variants={itemVariants}>
           <Image
             src="/imagens/pinte-sonhos.jpg"
             alt="Pinte seus sonhos"
@@ -112,38 +60,34 @@ const SubscriptionSection = () => {
             priority
             className={styles.decorativeImage}
           />
-        </div>
+        </motion.div>
 
-        <div ref={textPanelRef} className={styles.textPanel}>
-          <p ref={subheadingRef} className={styles.sectionSubheading}>
-            Entre em um mundo de cores e <span ref={subheadingImaginationRef} className={styles.subheadingImaginationWord}>imaginação</span>!
-          </p>
-          <h2 ref={titleRef} className={styles.sectionTitle}>
-            Clube de Assinatura <span ref={doodleDreamsTitleRef} className={styles.doodleDreamsTitleWord}>DoodleDreams</span>
-          </h2>
-          <p ref={descriptionRef} className={styles.sectionDescription}>
+        <div className={styles.textPanel}>
+          <motion.p variants={itemVariants} className={styles.sectionSubheading}>
+            Entre em um mundo de cores e <span className={styles.subheadingImaginationWord}>imaginação</span>!
+          </motion.p>
+          <motion.h2 variants={itemVariants} className={styles.sectionTitle}>
+            Clube de Assinatura <span className={styles.doodleDreamsTitleWord}>DoodleDreams</span>
+          </motion.h2>
+          <motion.p variants={itemVariants} className={styles.sectionDescription}>
             Descubra a alegria de colorir com nossa caixa mensal mágica.
             Cada edição é uma surpresa cuidadosamente selecionada,
             repleta de livros inspiradores, materiais exclusivos e atividades
             criativas que acendem a centelha da imaginação em todas as idades.
-          </p>
+          </motion.p>
 
           <ul className={styles.benefitsList}>
             {benefits.map((benefit, index) => (
               <motion.li
                 key={index}
-                ref={el => benefitsRef.current[index] = el}
                 className={styles.benefitItem}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.5 }}
-                transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
+                variants={itemVariants} // Reutiliza a mesma variante de item
               >
                 <motion.div
                   initial={{ scale: 0 }}
                   whileInView={{ scale: 1 }}
                   viewport={{ once: true, amount: 0.5 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10, delay: 0.2 + index * 0.15 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10, delay: 0.1 * index }}
                 >
                   <BsStarFill className={styles.benefitIcon} />
                 </motion.div>
@@ -152,20 +96,14 @@ const SubscriptionSection = () => {
             ))}
           </ul>
 
-          <motion.div
-            ref={buttonRef}
-            whileHover={{ scale: 1.05, boxShadow: "0 10px 20px rgba(246, 197, 213, 0.6)" }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            className={styles.buttonWrapper}
-          >
+          <motion.div variants={itemVariants} className={styles.buttonWrapper}>
             <Link href="/subscription-plans" className={styles.explorePlansButton}>
               Conhecer os Planos Mágicos
             </Link>
           </motion.div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };
 
