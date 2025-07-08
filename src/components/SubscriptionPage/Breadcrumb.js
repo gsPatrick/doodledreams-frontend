@@ -1,4 +1,4 @@
-    'use client';
+'use client';
 import Link from 'next/link';
 import styles from './Breadcrumb.module.css';
 import { HiChevronRight } from 'react-icons/hi';

@@ -13,11 +13,15 @@ const CartItem = ({ item }) => {
     updateQuantity(item.id, item.variation.id, item.quantity + amount);
   };
 
+  // --- CORREÇÃO APLICADA AQUI ---
+  // Determina a URL da imagem com segurança, usando um placeholder como fallback.
+  const imageUrl = item.imageSrc || 'https://placehold.co/100x100/EEE/333?text=Sem+Imagem';
+
   return (
     <div className={styles.cartItem}>
       <div className={styles.itemImageWrapper}>
         <Image
-          src={item.images[0].src} // Usando a primeira imagem do produto
+          src={imageUrl} // Usa a URL segura que acabamos de criar
           alt={item.name}
           width={100}
           height={100}

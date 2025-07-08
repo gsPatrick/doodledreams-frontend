@@ -1,0 +1,17 @@
+/* src/app/[slug]/ProductPage.module.css */
+
+.productPageGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: flex-start; /* Alinha os itens ao topo do grid */
+    margin: 2rem 0;
+}
+
+/* --- Responsividade para Tablet e Mobile --- */
+@media (max-width: 991px) {
+    .productPageGrid {
+        grid-template-columns: 1fr; /* Transforma em coluna única */
+        gap: 2.5rem; /* Reduz o espaçamento entre os itens empilhados */
+    }
+}

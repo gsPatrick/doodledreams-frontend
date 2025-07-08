@@ -1,74 +1,115 @@
+// src/components/ProductPage/ProductGallery.js
+
 'use client';
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import styles from './ProductGallery.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BsFillPlayCircleFill } from 'react-icons/bs'; // Ícone para o thumbnail do vídeo
 
-const ProductGallery = ({ images }) => {
-  // Verificação de segurança: Se não houver imagens ou o array estiver vazio, define um estado inicial seguro.
-  const initialImage = (images && images.length > 0) ? images[0] : null;
-  const [mainImage, setMainImage] = useState(initialImage);
+const ProductGallery = ({ arquivoProdutos }) => {
 
-  // Se o array de imagens mudar (ex: em uma navegação SPA), atualiza a imagem principal.
   useEffect(() => {
-    setMainImage((images && images.length > 0) ? images[0] : null);
-  }, [images]);
+    console.log(">>> ArquivoProdutos recebidos no ProductGallery:", arquivoProdutos);
+  }, [arquivoProdutos]);
 
-  // Se não houver imagem inicial, renderiza um placeholder.
-  if (!mainImage) {
+  const images = (arquivoProdutos || []).filter(file => file.tipo === 'imagem');
+  const videos = (arquivoProdutos || []).filter(file => file.tipo === 'video');
+
+  const initialDisplayedMedia = images.find(img => img.principal)
+    ? images.find(img => img.principal)
+    : (videos.length > 0 ? videos[0] : images[0] || null);
+
+  const [displayedMedia, setDisplayedMedia] = useState(initialDisplayedMedia);
+
+  useEffect(() => {
+    setDisplayedMedia(initialDisplayedMedia);
+  }, [arquivoProdutos, initialDisplayedMedia]);
+
+  if (!displayedMedia) {
     return (
       <div className={styles.galleryContainer}>
-        <div className={styles.mainImageWrapper}>
+        <div className={styles.mainMediaWrapper}>
             <div className={styles.placeholder}>
-                <span>Sem imagem</span>
+                <span>Sem mídia</span>
             </div>
         </div>
       </div>
     );
   }
 
+  const thumbnails = [];
+  if (videos.length > 0) {
+      thumbnails.push(videos[0]);
+  }
+  thumbnails.push(...images);
+
   return (
     <div className={styles.galleryContainer}>
-      <div className={styles.mainImageWrapper}>
+      <div className={styles.mainMediaWrapper}>
         <AnimatePresence mode="wait">
           <motion.div
-            key={mainImage.src} // A chave garante que a animação rode a cada troca de imagem
+            key={displayedMedia.url}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
+            className={styles.displayedMediaContent}
           >
-            <Image
-              src={mainImage.src}
-              alt={mainImage.alt}
-              width={600}
-              height={600}
-              priority // Imagem principal do produto deve ser priorizada
-              className={styles.mainImage}
-            />
+            {displayedMedia.tipo === 'imagem' ? (
+              <Image
+                src={displayedMedia.url}
+                alt={displayedMedia.nome || 'Imagem do produto'}
+                // <<< MUDANÇA AQUI: Removido layout="fill" e adicionado width/height ou aspectRatio
+                width={600} // Ajuste este valor conforme o tamanho desejado
+                height={600} // Ajuste este valor conforme o tamanho desejado
+                // Se preferir, use aspectRatio em vez de width/height diretamente no CSS
+                className={styles.mainImage} // Mantenha a classe para CSS específico
+              />
+            ) : (
+               <video
+                  src={displayedMedia.url}
+                  controls
+                  playsInline
+                  autoPlay
+                  muted
+                  loop
+                  // A classe 'mainVideo' já pode conter um aspectRatio definido no CSS
+                  className={styles.mainVideo}
+               >
+                 Seu navegador não suporta o elemento de vídeo.
+               </video>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
-      
-      {/* Só renderiza as miniaturas se houver mais de uma imagem */}
-      {images.length > 1 && (
+
+      {(videos.length + images.length) > 1 && (
         <div className={styles.thumbnailGrid}>
-          {images.map((image, index) => (
-            <motion.div
-              key={index}
-              className={`${styles.thumbnailWrapper} ${mainImage.src === image.src ? styles.active : ''}`}
-              onClick={() => setMainImage(image)}
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            >
-              <Image
-                src={image.src}
-                alt={image.alt}
-                width={100}
-                height={100}
-                className={styles.thumbnailImage}
-              />
-            </motion.div>
+          {thumbnails.map((media, index) => (
+             <motion.div
+                key={media.id || media.url}
+                className={`${styles.thumbnailWrapper} ${displayedMedia.url === media.url ? styles.active : ''}`}
+                onClick={() => setDisplayedMedia(media)}
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: 'spring', stiffness: 300 }}
+             >
+                 {media.tipo === 'imagem' ? (
+                    <Image
+                       src={media.url}
+                       alt={media.nome || 'Miniatura'}
+                       // <<< MUDANÇA AQUI: Removido layout="fill"
+                       width={100} // Tamanho da miniatura
+                       height={100} // Tamanho da miniatura
+                       className={styles.thumbnailImage}
+                    />
+                 ) : (
+                   <div className={styles.videoThumbnailPlaceholder}>
+                       <BsFillPlayCircleFill className={styles.playIcon} />
+                       <span>Vídeo</span>
+                   </div>
+                 )}
+             </motion.div>
           ))}
         </div>
       )}

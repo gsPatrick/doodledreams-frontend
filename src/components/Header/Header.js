@@ -10,7 +10,7 @@ import styles from './Header.module.css';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext'; 
 
-// React Icons (adicionando ícone de logout)
+// React Icons
 import { BsPhone, BsEnvelope, BsSearch, BsPerson, BsPersonFill, BsHeart, BsCart, BsTiktok, BsBoxArrowRight } from 'react-icons/bs';
 import { FaFacebookF, FaInstagram } from 'react-icons/fa';
 import { HiOutlineBars3, HiXMark, HiChevronDown, HiChevronRight } from 'react-icons/hi2';
@@ -24,10 +24,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCatalogDropdownOpen, setIsCatalogDropdownOpen] = useState(false);
 
-  // Usar o contexto de autenticação real
-  const { isAuthenticated, user, logout } = useAuth(); 
-
-  // Obter itens do carrinho do nosso context
+  const { isAuthenticated, user, logout } = useAuth();
   const { cartItems } = useCart();
   const totalItemsInCart = cartItems.reduce((total, item) => total + item.quantity, 0);
 
@@ -76,7 +73,6 @@ const Header = () => {
     setIsCatalogDropdownOpen(!isCatalogDropdownOpen);
   };
   
-  // Definição dos links com as URLs corretas para filtragem
   const desktopNavLinks = [
     { name: 'Home', href: '/' },
     { name: 'Catálogo', href: '/catalog', hasDropdown: true, dropdownContent: (
@@ -84,7 +80,6 @@ const Header = () => {
           <div className={styles.dropdownColumn}>
             <h4 className={styles.dropdownColumnTitle}>Por Categoria</h4>
             <ul>
-              {/* IDs devem corresponder aos IDs da API de categorias */}
               <li><Link href="/catalog?category=adulto" className={styles.dropdownLink}>Adulto</Link></li>
               <li><Link href="/catalog?category=infantil" className={styles.dropdownLink}>Infantil</Link></li>
               <li><Link href="/catalog?category=juvenil" className={styles.dropdownLink}>Juvenil</Link></li>
@@ -108,18 +103,14 @@ const Header = () => {
   
   const mobileNavLinks = [
     { name: 'Home', href: '/' },
-    { name: 'Catálogo', href: '/catalog', hasSubMenu: true },
+    { name: 'Catálogo', href: '/catalog' },
     { name: 'Assinatura', href: '/subscription' },
     { name: 'Sobre Nós', href: '/about' },
-    { name: 'Contato', href: '/contact' },
-    { name: 'Blog', href: '/blog' },
-    { name: 'Downloads Grátis', href: '/downloads' },
   ];
 
   return (
     <>
       <header ref={headerRef} className={styles.header}>
-        {/* Top Bar */}
         <div className={styles.topBarWrapper}>
             <div className={styles.topBar}>
                 <div className={styles.topBarContent}>
@@ -136,7 +127,6 @@ const Header = () => {
             </div>
         </div>
 
-        {/* Main Bar */}
         <div className={styles.mainBar}>
           <div className={styles.mainBarContent}>
             <Link href="/" className={styles.mainLogo}><span>Doodle Dreams</span></Link>
@@ -145,7 +135,7 @@ const Header = () => {
                 <button className={styles.searchButton} aria-label="Buscar"><BsSearch className={styles.searchIcon} /></button>
             </div>
             <div className={styles.mainActionIcons}>
-              
+              {/* CORREÇÃO: Links de conta e favoritos agora escondidos em mobile */ }
               <Link href={isAuthenticated ? "/my-account" : "/auth"} className={`${styles.mainActionLink} ${styles.hideOnMobile} ${isAuthenticated ? styles.loggedInUser : ''}`}>
                 {isAuthenticated ? <BsPersonFill className={styles.mainIcon} /> : <BsPerson className={styles.mainIcon} />}
                 <span>{isAuthenticated ? `Olá, ${user.nome.split(' ')[0]}` : 'Entrar'}</span>
@@ -158,8 +148,8 @@ const Header = () => {
                 </button>
               )}
               
-              <Link href="/favorites" className={`${styles.mainActionLink} ${styles.hideOnMobile}`}><BsHeart className={styles.mainIcon} /><span>Favoritos</span></Link>
               
+              {/* Carrinho permanece visível em todas as telas */}
               <Link href="/cart" className={styles.mainActionLink}>
                 <div className={styles.cartIconWrapper}>
                   <BsCart className={styles.mainIcon} />
@@ -167,6 +157,7 @@ const Header = () => {
                     <span className={styles.cartBadge}>{totalItemsInCart}</span>
                   )}
                 </div>
+                {/* O texto "Carrinho" será escondido via CSS no mobile */}
                 <span>Carrinho</span>
               </Link>
               
@@ -175,7 +166,6 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Nav Bar */}
         <div className={styles.navBar}>
           <div className={styles.navBarContent}>
             <nav className={styles.nav}>
@@ -198,12 +188,11 @@ const Header = () => {
         </div>
       </header>
 
-      {/* Off-Canvas Menu para Mobile */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
-            <motion.div className={styles.overlay} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.2 } }} onClick={() => setIsMenuOpen(false)} />
-            <motion.div className={styles.offCanvasMenu} initial={{ x: '100%' }} animate={{ x: '0%' }} exit={{ x: '100%', transition: { type: 'tween', ease: 'easeIn', duration: 0.3 } }} transition={{ type: 'tween', ease: 'easeOut', duration: 0.3 }}>
+            <motion.div className={styles.overlay} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsMenuOpen(false)} />
+            <motion.div className={styles.offCanvasMenu} initial={{ x: '100%' }} animate={{ x: '0%' }} exit={{ x: '100%' }} transition={{ type: 'tween', ease: 'easeOut', duration: 0.3 }}>
               <div className={styles.menuHeader}>
                 <span className={styles.menuTitle}>Menu</span>
                 <button className={styles.closeButton} onClick={() => setIsMenuOpen(false)} aria-label="Fechar Menu"><HiXMark /></button>
@@ -215,41 +204,24 @@ const Header = () => {
                             <li key={link.name} className={styles.menuNavItem}>
                                 <Link href={link.href} className={styles.menuNavLink} onClick={() => setIsMenuOpen(false)}>
                                     {link.name}
-                                    {link.hasSubMenu && <HiChevronRight className={styles.menuSubMenuIcon} />}
                                 </Link>
                             </li>
                         ))}
                     </ul>
                 </nav>
+                {/* CORREÇÃO: Links de Conta e Sair adicionados aqui dentro do menu */ }
                 <div className={styles.menuActionLinks}>
-                  
                   <Link href={isAuthenticated ? "/my-account" : "/auth"} className={styles.menuActionLink} onClick={() => setIsMenuOpen(false)}>
                     {isAuthenticated ? <BsPersonFill className={styles.menuActionIcon} /> : <BsPerson className={styles.menuActionIcon} />}
-                    {isAuthenticated ? `Olá, ${user.nome.split(' ')[0]}` : 'Entrar / Cadastrar'}
+                    {isAuthenticated ? `Minha Conta` : 'Entrar / Cadastrar'}
                   </Link>
-
-                  <Link href="/favorites" className={styles.menuActionLink} onClick={() => setIsMenuOpen(false)}><BsHeart className={styles.menuActionIcon} />Favoritos</Link>
                   
                   {isAuthenticated && (
-                     <button onClick={() => { logout(); setIsMenuOpen(false); }} className={styles.menuActionLink} style={{background: 'none', border: 'none', padding: 0, textAlign: 'left', width: '100%'}}>
+                     <button onClick={() => { logout(); setIsMenuOpen(false); }} className={styles.menuActionLink}>
                        <BsBoxArrowRight className={styles.menuActionIcon} />
                        Sair
                      </button>
                   )}
-
-                  <div className={styles.menuSearchContainer}>
-                    <input type="text" placeholder="Buscar..." className={styles.menuSearchInput} />
-                    <button className={styles.menuSearchButton} aria-label="Buscar"><BsSearch /></button>
-                  </div>
-                </div>
-                <div className={styles.menuContactInfo}>
-                    <a href="tel:+5511954728628" className={styles.menuContactLink}><BsPhone className={styles.menuContactIcon} />(11) 95472-8628</a>
-                    <a href="mailto:contato@doodledreams.com.br" className={styles.menuContactLink}><BsEnvelope className={styles.menuContactIcon} />contato@doodledreams.com.br</a>
-                    <div className={styles.menuSocialLinks}>
-                        <a href="#" className={styles.menuSocialLink} aria-label="TikTok"><BsTiktok /></a>
-                        <a href="#" className={styles.menuSocialLink} aria-label="Facebook"><FaFacebookF /></a>
-                        <a href="#" className={styles.menuSocialLink} aria-label="Instagram"><FaInstagram /></a>
-                    </div>
                 </div>
               </div>
             </motion.div>

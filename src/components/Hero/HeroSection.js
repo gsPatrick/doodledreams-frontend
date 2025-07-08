@@ -97,17 +97,16 @@ const HeroSection = () => {
 
   }, []);
 
-  // CORREÇÃO: Estrutura do título para controle preciso de espaçamento e quebras de linha
-  // As quebras de linha serão forçadas com <br /> em pontos específicos.
-  // O espaçamento entre as palavras será via CSS.
+  // Estrutura do título ajustada para "Imaginação" ficar em uma linha própria.
   const titleParts = [
     { text: "Livros", isWord: true },
     { text: "que", isWord: true },
-    { text: null, isBreak: true }, // Quebra de linha após "que"
+    { text: null, isBreak: true },
     { text: "despertam", isWord: true },
     { text: "a", isWord: true },
-    { text: null, isBreak: true }, // Quebra de linha após "a"
+    { text: null, isBreak: true },
     { text: "sua", isWord: true },
+    { text: null, isBreak: true },
     { text: "Imaginação", isWord: true, isAnimated: true },
   ];
 
@@ -127,14 +126,13 @@ const HeroSection = () => {
         </span>
       );
     }
-    return null; // Caso algum tipo inesperado
+    return null;
   });
 
 
   return (
     <section ref={sectionRef} className={styles.heroSection}>
       <div className={styles.heroContent}>
-        {/* Lado Esquerdo: Imagem da Logo */}
         <div className={styles.heroImageContainer}>
           <Image
             ref={logoRef}
@@ -147,16 +145,16 @@ const HeroSection = () => {
           />
         </div>
 
-        {/* Lado Direito: Título, Descrição e Botões */}
         <div className={styles.heroTextContainer}>
           <h1 ref={titleRef} className={styles.heroTitle}>
-            {titleElements} {/* Renderiza os elementos do título */}
+            {titleElements}
           </h1>
           <p ref={descriptionRef} className={styles.heroDescription}>
             Descubra histórias mágicas e ilustrações encantadoras para todas as idades. Nossos livros são cuidadosamente criados para inspirar, educar e encantar.
           </p>
           <div ref={buttonsRef} className={styles.heroButtons}>
             <motion.div
+              className={styles.buttonWrapper}
               whileHover={{ scale: 1.03, boxShadow: "0 8px 16px rgba(144, 122, 204, 0.4)" }}
               whileTap={{ scale: 0.98 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -166,6 +164,7 @@ const HeroSection = () => {
               </Link>
             </motion.div>
             <motion.div
+              className={styles.buttonWrapper}
               whileHover={{ scale: 1.03, boxShadow: "0 4px 8px rgba(122, 151, 204, 0.2)" }}
               whileTap={{ scale: 0.98 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}

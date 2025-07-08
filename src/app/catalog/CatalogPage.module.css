@@ -1,0 +1,65 @@
+/* src/app/catalog/CatalogPage.module.css */
+
+.pageHeader {
+  max-width: 1400px;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+.pageTitle {
+  font-family: var(--font-mali-next);
+  font-size: 3rem;
+  color: var(--doodle-dark-grey);
+}
+
+.pageSubtitle {
+  font-size: 1.1rem;
+  color: var(--doodle-placeholder-text);
+  margin-top: 0.5rem;
+}
+
+.catalogLayout {
+  display: grid;
+  grid-template-columns: 300px 1fr; /* Coluna do filtro e coluna dos produtos */
+  gap: 2.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  align-items: flex-start;
+}
+
+/* Esconde o botão de filtro em telas grandes */
+.mobileFilterButton {
+  display: none;
+}
+
+/* --- Responsividade para Tablet e Mobile --- */
+@media (max-width: 991px) {
+  .catalogLayout {
+    /* Em telas menores, o grid de produtos ocupa a tela toda */
+    grid-template-columns: 1fr;
+  }
+  
+  /* Esconde a barra lateral de filtros do desktop */
+  .desktopSidebar {
+    display: none;
+  }
+  
+  /* Mostra o botão para abrir os filtros */
+  .mobileFilterButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    font-family: var(--font-mali-next);
+    font-size: 1.1rem;
+    font-weight: 700;
+    background-color: var(--doodle-white);
+    color: var(--doodle-purple-soft);
+    border: 2px solid var(--doodle-purple-soft);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  }
+}

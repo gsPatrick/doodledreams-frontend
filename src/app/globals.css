@@ -17,18 +17,13 @@
   --doodle-placeholder-text: #6C757D;
   --doodle-white: #FFFFFF;
 
-   --doodle-white: #FFFFFF; /* Fundo branco puro para o footer */
-  --doodle-footer-dark: #2c2f33; /* Um cinza escuro para a barra inferior */
-  --doodle-footer-text-light: #e0e0e0; /* Texto claro para a barra inferior */
-  --doodle-light-pink-bg: #fdf2f8; /* Fundo rosa bem claro para os ícones sociais */
-  --doodle-text-grey: #5c5c5c; /* Cinza para textos de descrição */
-
-  --doodle-background: #f7fbfd; /* <-- NOVA COR DE FUNDO GLOBAL */
 
   /* Variáveis para as fontes - preenchidas pelo next/font no layout.js */
   --font-mali-next: sans-serif; /* Fallback */
   --font-magnolia-next: serif; /* Fallback */
 }
+
+
 
 body {
   background-color: var(--doodle-background); /* Aplicando o novo fundo aqui */

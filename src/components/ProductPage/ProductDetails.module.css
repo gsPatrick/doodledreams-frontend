@@ -58,9 +58,14 @@
 .quantitySelector { display: flex; align-items: center; border: 1px solid var(--doodle-input-border); border-radius: 99px; }
 .quantitySelector button { background: none; border: none; padding: 0.8rem 1rem; cursor: pointer; font-size: 1.2rem; color: var(--doodle-purple-soft); }
 .quantitySelector span { font-weight: 700; font-size: 1.2rem; padding: 0 0.5rem; }
-.addToCartButton { flex-grow: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem; background-color: var(--doodle-purple-soft); color: white; border: none; border-radius: 99px; padding: 1rem; font-family: var(--font-mali-next); font-size: 1.1rem; font-weight: 700; cursor: pointer; }
+.addToCartButton { flex-grow: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem; background-color: var(--doodle-purple-soft); color: white; border: none; border-radius: 99px; padding: 1rem; font-family: var(--font-mali-next); font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: background-color 0.3s ease, filter 0.3s ease; }
 
-/* Botão de Lista de Desejos */
+.addToCartButton.added {
+  background-color: var(--doodle-green-pastel);
+  color: #1e6a25;
+  cursor: not-allowed;
+}
+
 .wishlistButton { 
     display: flex; 
     align-items: center; 
@@ -71,35 +76,32 @@
     font-family: sans-serif;
     font-weight: 600; 
     cursor: pointer;
-    margin-top: 1rem; /* Espaçamento acima do botão */
-    padding: 0.5rem; /* Área de clique maior */
+    margin-top: 1rem;
+    padding: 0.5rem;
 }
 
-/* src/components/ProductPage/ProductDetails.module.css */
-
-/* ... (todos os outros estilos existentes) ... */
-
-.addToCartButton { 
-    flex-grow: 1; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    gap: 0.75rem; 
-    background-color: var(--doodle-purple-soft); 
-    color: white; border: none; 
-    border-radius: 99px; 
-    padding: 1rem; 
-    font-family: var(--font-mali-next); 
-    font-size: 1.1rem; 
-    font-weight: 700; 
-    cursor: pointer; 
-    /* Adiciona transição para a mudança de cor */
-    transition: background-color 0.3s ease, filter 0.3s ease;
-}
-
-/* NOVO ESTILO PARA O BOTÃO QUANDO O ITEM É ADICIONADO */
-.addToCartButton.added {
-  background-color: var(--doodle-green-pastel);
-  color: #1e6a25; /* Um verde escuro para o texto */
-  cursor: not-allowed;
+/* CORREÇÃO: Ajustes para responsividade */
+@media (max-width: 991px) {
+    .detailsContainer {
+        padding-left: 0; /* Remove o padding para centralizar */
+    }
+    .productTitle {
+        font-size: 2.2rem; /* Reduz o título para mobile */
+        text-align: center;
+    }
+    .productPrice {
+        font-size: 1.8rem;
+        text-align: center;
+    }
+    .productShortDescription {
+        text-align: center;
+        max-width: 100%;
+    }
+    .actionsWrapper {
+        flex-direction: column; /* Empilha o seletor de quantidade e o botão */
+    }
+    .wishlistButton {
+        justify-content: center; /* Centraliza o botão de wishlist */
+        width: 100%;
+    }
 }

@@ -74,29 +74,7 @@ const ProductCard = ({ product, index }) => {
       </Link>
 
       <div className={styles.cardActions}>
-          <motion.button
-            className={styles.addToCartButton}
-            style={{ backgroundColor: buttonColor, borderColor: buttonColor }}
-            whileHover={{ backgroundColor: hoverColor, borderColor: hoverColor, scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            onClick={handleAddToCart}
-            aria-label={`Adicionar ${product.name} ao carrinho`}
-          >
-            Adicionar ao Carrinho
-          </motion.button>
           
-          {/* 3. Adicionar o novo botão de favoritos */}
-          <motion.button
-            className={styles.addToFavoritesButton}
-            onClick={handleAddToFavorites}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            aria-label={`Adicionar ${product.name} aos favoritos`}
-          >
-            <BsHeart />
-            Adicionar aos Favoritos
-          </motion.button>
       </div>
     </motion.div>
   );

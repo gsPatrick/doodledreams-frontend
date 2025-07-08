@@ -89,3 +89,16 @@
 
 /* REMOVIDO: Estilos antigos que não são mais necessários */
 /* .noResultsIcon, .emptyMessage, .noResults p, etc. */
+
+@media (max-width: 767px) {
+  .noResults {
+    /* Remove o padding excessivo em telas de celular */
+    padding: 0;
+    min-height: 300px; /* Reduz a altura mínima também */
+  }
+
+  .noResultsTitle {
+      /* Ajusta o tamanho da fonte para não ficar tão grande no celular */
+      font-size: clamp(2rem, 8vw, 2.5rem);
+  }
+}

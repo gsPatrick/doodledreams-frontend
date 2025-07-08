@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './FilterSidebar.module.css';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { BsX } from 'react-icons/bs';
 
 const categories = [
   { id: 'infantil', name: 'Infantil' },
@@ -12,50 +13,57 @@ const categories = [
   { id: 'artigosDiversos', name: 'Artigos Diversos' },
 ];
 
-const FilterSidebar = ({ filters, setFilters }) => {
+// O componente agora aceita props para controlar o estado mobile
+const FilterSidebar = ({ filters, setFilters, isOpen, onClose }) => {
+  // Estado local para modificações temporárias no mobile
+  const [localFilters, setLocalFilters] = useState(filters);
+
+  useEffect(() => {
+    // Sincroniza o estado local se o estado global mudar
+    setLocalFilters(filters);
+  }, [filters]);
+
   const handleCategoryChange = (categoryId) => {
-    const newCategories = filters.categories.includes(categoryId)
-      ? filters.categories.filter((c) => c !== categoryId)
-      : [...filters.categories, categoryId];
-    setFilters({ ...filters, categories: newCategories });
+    const newCategories = localFilters.categories.includes(categoryId)
+      ? localFilters.categories.filter((c) => c !== categoryId)
+      : [...localFilters.categories, categoryId];
+    setLocalFilters({ ...localFilters, categories: newCategories });
   };
 
   const handlePriceChange = (e) => {
     const { name, value } = e.target;
-    // Garante que o valor não seja negativo
     const newValue = Math.max(0, Number(value));
-    setFilters({ ...filters, price: { ...filters.price, [name]: newValue } });
+    setLocalFilters({ ...localFilters, price: { ...localFilters.price, [name]: newValue } });
   };
 
+  // Função para aplicar os filtros e fechar o modal no mobile
+  const applyFiltersAndClose = () => {
+    setFilters(localFilters);
+    if (onClose) onClose();
+  };
+  
+  // Limpa os filtros tanto no local quanto no global
   const clearFilters = () => {
-    setFilters({
-      categories: [],
-      price: { min: 0, max: 100 },
-      sort: 'popularity',
-    });
+      const cleared = {
+          categories: [],
+          price: { min: 0, max: 100 },
+          sort: 'popularity',
+      };
+      setLocalFilters(cleared);
+      setFilters(cleared); // Limpa o global também
+      if(onClose) onClose();
   };
 
-  return (
-    <motion.aside 
-      className={styles.sidebar}
-      initial={{ x: -100, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-    >
-      <div className={styles.decorativeDot}></div>
+  const FilterContent = () => (
+    <>
       <div className={styles.filterSection}>
         <h3 className={styles.filterTitle}>Categorias</h3>
+        {/* ... restante do conteúdo do filtro ... */}
         <ul className={styles.filterList}>
           {categories.map((category) => (
             <li key={category.id} className={styles.checkboxItem}>
-              <input
-                type="checkbox"
-                id={category.id}
-                name={category.id}
-                checked={filters.categories.includes(category.id)}
-                onChange={() => handleCategoryChange(category.id)}
-              />
-              <label htmlFor={category.id}>{category.name}</label>
+              <input type="checkbox" id={`${category.id}-${isOpen ? 'mobile' : 'desktop'}`} checked={localFilters.categories.includes(category.id)} onChange={() => handleCategoryChange(category.id)} />
+              <label htmlFor={`${category.id}-${isOpen ? 'mobile' : 'desktop'}`}>{category.name}</label>
             </li>
           ))}
         </ul>
@@ -65,38 +73,21 @@ const FilterSidebar = ({ filters, setFilters }) => {
         <h3 className={styles.filterTitle}>Faixa de Preço</h3>
         <div className={styles.priceInputs}>
           <div className={styles.priceField}>
-            <label htmlFor="min">Mín.</label>
-            <input
-              type="text" // Usar text para poder formatar com 'R$'
-              id="min"
-              name="min"
-              value={`R$ ${filters.price.min}`}
-              onChange={(e) => handlePriceChange({ target: { name: 'min', value: e.target.value.replace('R$ ', '') } })}
-            />
+            <label htmlFor={`min-${isOpen ? 'mobile' : 'desktop'}`}>Mín.</label>
+            <input type="text" id={`min-${isOpen ? 'mobile' : 'desktop'}`} name="min" value={`R$ ${localFilters.price.min}`} onChange={(e) => handlePriceChange({ target: { name: 'min', value: e.target.value.replace('R$ ', '') } })} />
           </div>
           <div className={styles.priceField}>
-            <label htmlFor="max">Máx.</label>
-            <input
-              type="text"
-              id="max"
-              name="max"
-              value={`R$ ${filters.price.max}`}
-              onChange={(e) => handlePriceChange({ target: { name: 'max', value: e.target.value.replace('R$ ', '') } })}
-            />
+            <label htmlFor={`max-${isOpen ? 'mobile' : 'desktop'}`}>Máx.</label>
+            <input type="text" id={`max-${isOpen ? 'mobile' : 'desktop'}`} name="max" value={`R$ ${localFilters.price.max}`} onChange={(e) => handlePriceChange({ target: { name: 'max', value: e.target.value.replace('R$ ', '') } })} />
           </div>
         </div>
-        {/* Placeholder para o range slider visual, estilizado para se parecer com a imagem */}
         <div className={styles.rangeSliderBar}></div>
       </div>
 
       <div className={styles.filterSection}>
         <h3 className={styles.filterTitle}>Ordenar por</h3>
         <div className={styles.selectWrapper}>
-          <select 
-            className={styles.sortSelect}
-            value={filters.sort}
-            onChange={(e) => setFilters({...filters, sort: e.target.value})}
-          >
+          <select className={styles.sortSelect} value={localFilters.sort} onChange={(e) => setLocalFilters({...localFilters, sort: e.target.value})}>
             <option value="popularity">Mais Populares</option>
             <option value="newest">Mais Recentes</option>
             <option value="price-asc">Preço: Menor para Maior</option>
@@ -104,16 +95,42 @@ const FilterSidebar = ({ filters, setFilters }) => {
           </select>
         </div>
       </div>
+    </>
+  );
 
-      <motion.button
-        className={styles.clearButton}
-        onClick={clearFilters}
-        whileHover={{ scale: 1.05, filter: 'brightness(1.1)' }}
-        whileTap={{ scale: 0.95 }}
-      >
+  // Se for mobile (identificado pela prop `isOpen`), renderiza o overlay
+  if (typeof isOpen !== 'undefined') {
+    return (
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div className={styles.overlay} onClick={onClose} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
+            <motion.div className={styles.sidebarMobile} initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', stiffness: 300, damping: 30 }}>
+              <div className={styles.mobileHeader}>
+                <h4>Filtrar Produtos</h4>
+                <button onClick={onClose} className={styles.closeButton}><BsX size={32} /></button>
+              </div>
+              <div className={styles.mobileContent}><FilterContent /></div>
+              <div className={styles.mobileFooter}>
+                <button onClick={clearFilters} className={styles.clearButtonMobile}>Limpar</button>
+                <button onClick={applyFiltersAndClose} className={styles.applyButton}>Aplicar Filtros</button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    );
+  }
+
+  // Se não, renderiza a versão desktop padrão
+  return (
+    <aside className={styles.sidebar}>
+      <div className={styles.decorativeDot}></div>
+      <FilterContent />
+      <motion.button className={styles.clearButton} onClick={clearFilters} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
         Limpar Filtros
       </motion.button>
-    </motion.aside>
+    </aside>
   );
 };
 

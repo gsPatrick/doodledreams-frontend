@@ -2,9 +2,9 @@
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 1.5rem 1.5rem 0 1.5rem;
-    padding-top: calc(180px + 2rem);
-
+  padding: 2rem 1.5rem 1.5rem 1.5rem; 
+  /* CORREÇÃO: Impede que o padding cause rolagem horizontal */
+  box-sizing: border-box; 
 }
 
 .breadcrumbList {
@@ -15,6 +15,7 @@
   margin: 0;
   font-family: sans-serif;
   font-size: 0.95rem;
+  flex-wrap: wrap; 
 }
 
 .breadcrumbItem {
@@ -40,4 +41,15 @@
 
 .breadcrumbCurrent {
   color: var(--doodle-dark-grey);
+}
+
+/* --- Responsividade para Mobile --- */
+@media (max-width: 767px) {
+  .breadcrumbNav {
+    padding: 1.5rem 1rem 1.5rem 1rem;
+  }
+
+  .breadcrumbList {
+    font-size: 0.85rem;
+  }
 }

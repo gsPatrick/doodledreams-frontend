@@ -24,3 +24,19 @@
   font-size: 1.1rem;
   max-width: 80ch; /* Limita a largura da linha para melhor legibilidade */
 }
+
+/* CORREÇÃO: Ajustes para responsividade */
+@media (max-width: 767px) {
+    .descriptionContainer {
+        margin-top: 0; /* Zera a margem superior pois o gap do grid já resolve */
+    }
+    .content {
+        padding: 1.5rem; /* Menos padding em telas menores */
+    }
+    .content h4 {
+        font-size: 1.5rem;
+    }
+    .content p {
+        font-size: 1rem;
+    }
+}
