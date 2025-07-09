@@ -14,8 +14,6 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   useEffect(() => {
-    // A verificação já está dentro do useEffect, que só roda no cliente,
-    // mas adicionar a verificação explícita é uma boa prática.
     if (typeof window !== 'undefined') {
       try {
         const storedToken = localStorage.getItem('doodle_token');
@@ -31,16 +29,24 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('doodle_user');
       }
     }
-    setIsLoading(false); // Move para fora do if para garantir que sempre seja definido
+    setIsLoading(false);
   }, []);
 
-  const login = (userData, authToken) => {
-    // localStorage só será acessado aqui no cliente, o que é seguro.
+  // --- ALTERAÇÃO AQUI ---
+  // A função `login` agora aceita um terceiro argumento `redirectPath`.
+  // Por padrão, ela redireciona para '/my-account', mantendo o comportamento antigo.
+  // Se `redirectPath` for `null` ou `false`, o redirecionamento não acontece.
+  const login = (userData, authToken, redirectPath = '/my-account') => {
     localStorage.setItem('doodle_token', authToken);
     localStorage.setItem('doodle_user', JSON.stringify(userData));
     setToken(authToken);
     setUser(userData);
-    router.push('/my-account');
+
+    // Só redireciona se um caminho for fornecido (que é o comportamento padrão).
+    // No checkout, passaremos `null` para evitar este redirecionamento.
+    if (redirectPath) {
+        router.push(redirectPath);
+    }
   };
 
   const logout = () => {

@@ -1,33 +1,28 @@
+// src/app/catalog/page.js
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+// REMOVIDO: import { useSearchParams } from 'next/navigation';
+import { useFilter } from '@/context/FilterContext'; // ALTERAÇÃO: Importar o contexto de filtro
 import FilterSidebar from '@/components/CatalogPage/FilterSidebar';
 import ProductGrid from '@/components/CatalogPage/ProductGrid';
 import Breadcrumb from '@/components/SubscriptionPage/Breadcrumb';
 import api from '@/services/api';
-import styles from './CatalogPage.module.css'; // Importa o CSS Module
-import { BsFilterRight } from 'react-icons/bs'; // Ícone para o botão
+import styles from './CatalogPage.module.css';
+import { BsFilterRight } from 'react-icons/bs';
 
 export default function CatalogPage() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ total: 0, totalPages: 1, currentPage: 1 });
-  const [isFilterOpen, setIsFilterOpen] = useState(false); // Estado para o filtro mobile
-  const searchParams = useSearchParams();
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const [filters, setFilters] = useState(() => {
-    const categoryFromUrl = searchParams.get('category');
-    const sortFromUrl = searchParams.get('sort');
-    return {
-      categories: categoryFromUrl ? [categoryFromUrl] : [],
-      price: { min: 0, max: 100 },
-      sort: sortFromUrl || 'lancamentos',
-      limit: 500,
-      page: 1,
-    };
-  });
+  // ALTERAÇÃO: Usar o estado e a função do contexto global
+  const { filters, setFilters } = useFilter();
+  
+  // REMOVIDO: O useState local para 'filters' foi removido.
 
   useEffect(() => {
     document.body.classList.add('catalog-background');
@@ -42,11 +37,15 @@ export default function CatalogPage() {
       setError(null);
       try {
         const params = {
-          categorias: filters.categories.join(','),
+          // O ID da categoria na sua API é um número, então garantimos que a string seja convertida
+          // ou que a API aceite strings. Pelo seu backend, parece ser um número.
+          // Vamos garantir que a API receba números.
+          categorias: filters.categories.join(','), 
           ordenarPor: filters.sort,
           limit: filters.limit,
           page: filters.page,
         };
+        // Se a busca de categorias não encontrar nada, não mandamos o param
         if (!params.categorias) delete params.categorias;
 
         const response = await api.get('/produtos', { params });
@@ -71,7 +70,7 @@ export default function CatalogPage() {
       }
     };
     fetchProducts();
-  }, [filters]);
+  }, [filters]); // A busca agora reage a mudanças no filtro global
 
   const handlePageChange = (pageNumber) => {
     setFilters(prev => ({ ...prev, page: pageNumber }));
@@ -90,20 +89,17 @@ export default function CatalogPage() {
         <p className={styles.pageSubtitle}>Encontre o livro perfeito para colorir sua imaginação.</p>
       </div>
 
-      {/* Botão de Filtro para Mobile */}
       <button className={styles.mobileFilterButton} onClick={() => setIsFilterOpen(true)}>
         <BsFilterRight size={24} />
         Filtrar e Ordenar
       </button>
 
-      {/* Layout principal com grid */}
       <div className={styles.catalogLayout}>
-        {/* Sidebar para Desktop (escondida em mobile via CSS) */}
         <div className={styles.desktopSidebar}>
+          {/* Passando o estado e a função do contexto para a sidebar */}
           <FilterSidebar filters={filters} setFilters={setFilters} />
         </div>
         
-        {/* Sidebar para Mobile (aparece como overlay) */}
         <FilterSidebar
           filters={filters}
           setFilters={setFilters}

@@ -57,3 +57,12 @@ body.catalog-background {
     background-position: 500px 500px, 525px 525px;
   }
 }
+
+/* ALTERAÇÃO: Media query para remover o padding em telas mobile */
+@media (max-width: 767px) {
+    body {
+        /* No mobile, o header é fixo, então o padding deve ser ajustado para a altura do header mobile */
+        /* A altura do seu mainBar no mobile é aproximadamente 65px (1rem de padding + altura do logo/icones) */
+        padding-top: 65px; 
+    }
+}

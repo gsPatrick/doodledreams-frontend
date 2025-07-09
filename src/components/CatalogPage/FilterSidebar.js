@@ -1,25 +1,36 @@
+// src/components/CatalogPage/FilterSidebar.js
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import styles from './FilterSidebar.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BsX } from 'react-icons/bs';
+import api from '@/services/api';
 
-const categories = [
-  { id: 'infantil', name: 'Infantil' },
-  { id: 'juvenil', name: 'Juvenil' },
-  { id: 'adulto', name: 'Adulto' },
-  { id: 'tematico', name: 'Temáticos' },
-  { id: 'artigosDiversos', name: 'Artigos Diversos' },
-];
-
-// O componente agora aceita props para controlar o estado mobile
 const FilterSidebar = ({ filters, setFilters, isOpen, onClose }) => {
-  // Estado local para modificações temporárias no mobile
   const [localFilters, setLocalFilters] = useState(filters);
+  const [allCategories, setAllCategories] = useState([]);
+
+  const isDesktop = typeof isOpen === 'undefined';
 
   useEffect(() => {
-    // Sincroniza o estado local se o estado global mudar
+    const fetchCategories = async () => {
+      try {
+        const response = await api.get('/categorias');
+        const formattedCategories = response.data.map(cat => ({
+            id: String(cat.id),
+            nome: cat.nome
+        }));
+        setAllCategories(formattedCategories);
+      } catch (error) {
+        console.error("Falha ao buscar categorias para a Sidebar:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
     setLocalFilters(filters);
   }, [filters]);
 
@@ -27,43 +38,67 @@ const FilterSidebar = ({ filters, setFilters, isOpen, onClose }) => {
     const newCategories = localFilters.categories.includes(categoryId)
       ? localFilters.categories.filter((c) => c !== categoryId)
       : [...localFilters.categories, categoryId];
-    setLocalFilters({ ...localFilters, categories: newCategories });
+    
+    const newFilterState = { ...localFilters, categories: newCategories, page: 1 };
+    setLocalFilters(newFilterState);
+
+    if (isDesktop) {
+      setFilters(newFilterState);
+    }
   };
 
   const handlePriceChange = (e) => {
     const { name, value } = e.target;
-    const newValue = Math.max(0, Number(value));
+    const newValue = value === '' ? '' : Math.max(0, Number(value));
     setLocalFilters({ ...localFilters, price: { ...localFilters.price, [name]: newValue } });
   };
+  
+  const applyPriceFilter = () => {
+      const newFilterState = { ...localFilters, page: 1 };
+      setLocalFilters(newFilterState);
+      if (isDesktop) {
+          setFilters(newFilterState);
+      }
+  };
 
-  // Função para aplicar os filtros e fechar o modal no mobile
+  const handleSortChange = (e) => {
+      const newSortValue = e.target.value;
+      const newFilterState = { ...localFilters, sort: newSortValue, page: 1 };
+      setLocalFilters(newFilterState);
+
+      if (isDesktop) {
+          setFilters(newFilterState);
+      }
+  };
+
   const applyFiltersAndClose = () => {
     setFilters(localFilters);
     if (onClose) onClose();
   };
   
-  // Limpa os filtros tanto no local quanto no global
   const clearFilters = () => {
       const cleared = {
           categories: [],
           price: { min: 0, max: 100 },
-          sort: 'popularity',
+          sort: 'lancamentos',
+          limit: filters.limit,
+          page: 1,
       };
       setLocalFilters(cleared);
-      setFilters(cleared); // Limpa o global também
-      if(onClose) onClose();
+      setFilters(cleared);
+      if(!isDesktop && onClose) onClose();
   };
 
   const FilterContent = () => (
     <>
       <div className={styles.filterSection}>
         <h3 className={styles.filterTitle}>Categorias</h3>
-        {/* ... restante do conteúdo do filtro ... */}
         <ul className={styles.filterList}>
-          {categories.map((category) => (
+          {/* Mapeia as categorias da API para criar os checkboxes dinamicamente */}
+          {allCategories.map((category) => (
             <li key={category.id} className={styles.checkboxItem}>
               <input type="checkbox" id={`${category.id}-${isOpen ? 'mobile' : 'desktop'}`} checked={localFilters.categories.includes(category.id)} onChange={() => handleCategoryChange(category.id)} />
-              <label htmlFor={`${category.id}-${isOpen ? 'mobile' : 'desktop'}`}>{category.name}</label>
+              <label htmlFor={`${category.id}-${isOpen ? 'mobile' : 'desktop'}`}>{category.nome}</label>
             </li>
           ))}
         </ul>
@@ -74,11 +109,25 @@ const FilterSidebar = ({ filters, setFilters, isOpen, onClose }) => {
         <div className={styles.priceInputs}>
           <div className={styles.priceField}>
             <label htmlFor={`min-${isOpen ? 'mobile' : 'desktop'}`}>Mín.</label>
-            <input type="text" id={`min-${isOpen ? 'mobile' : 'desktop'}`} name="min" value={`R$ ${localFilters.price.min}`} onChange={(e) => handlePriceChange({ target: { name: 'min', value: e.target.value.replace('R$ ', '') } })} />
+            <input 
+              type="text" 
+              id={`min-${isOpen ? 'mobile' : 'desktop'}`} 
+              name="min" 
+              value={`R$ ${localFilters.price.min}`} 
+              onChange={(e) => handlePriceChange({ target: { name: 'min', value: e.target.value.replace('R$ ', '') } })}
+              onBlur={applyPriceFilter}
+            />
           </div>
           <div className={styles.priceField}>
             <label htmlFor={`max-${isOpen ? 'mobile' : 'desktop'}`}>Máx.</label>
-            <input type="text" id={`max-${isOpen ? 'mobile' : 'desktop'}`} name="max" value={`R$ ${localFilters.price.max}`} onChange={(e) => handlePriceChange({ target: { name: 'max', value: e.target.value.replace('R$ ', '') } })} />
+            <input 
+              type="text" 
+              id={`max-${isOpen ? 'mobile' : 'desktop'}`} 
+              name="max" 
+              value={`R$ ${localFilters.price.max}`} 
+              onChange={(e) => handlePriceChange({ target: { name: 'max', value: e.target.value.replace('R$ ', '') } })}
+              onBlur={applyPriceFilter}
+            />
           </div>
         </div>
         <div className={styles.rangeSliderBar}></div>
@@ -87,19 +136,18 @@ const FilterSidebar = ({ filters, setFilters, isOpen, onClose }) => {
       <div className={styles.filterSection}>
         <h3 className={styles.filterTitle}>Ordenar por</h3>
         <div className={styles.selectWrapper}>
-          <select className={styles.sortSelect} value={localFilters.sort} onChange={(e) => setLocalFilters({...localFilters, sort: e.target.value})}>
-            <option value="popularity">Mais Populares</option>
-            <option value="newest">Mais Recentes</option>
-            <option value="price-asc">Preço: Menor para Maior</option>
-            <option value="price-desc">Preço: Maior para Menor</option>
+          <select className={styles.sortSelect} value={localFilters.sort} onChange={handleSortChange}>
+            <option value="lancamentos">Mais Recentes</option>
+            <option value="mais-vendidos">Mais Populares</option>
+            <option value="preco_asc">Preço: Menor para Maior</option>
+            <option value="preco_desc">Preço: Maior para Menor</option>
           </select>
         </div>
       </div>
     </>
   );
 
-  // Se for mobile (identificado pela prop `isOpen`), renderiza o overlay
-  if (typeof isOpen !== 'undefined') {
+  if (!isDesktop) {
     return (
       <AnimatePresence>
         {isOpen && (
@@ -122,7 +170,6 @@ const FilterSidebar = ({ filters, setFilters, isOpen, onClose }) => {
     );
   }
 
-  // Se não, renderiza a versão desktop padrão
   return (
     <aside className={styles.sidebar}>
       <div className={styles.decorativeDot}></div>

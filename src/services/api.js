@@ -1,5 +1,3 @@
-// services/api.js
-
 import axios from 'axios';
 
 const API_URL = 'https://n8n-doodledreamsbackend.r954jc.easypanel.host/api';
@@ -16,6 +14,7 @@ api.interceptors.request.use(
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('doodle_token');
       if (token) {
+        // Garantir que o cabeçalho 'Authorization' está sendo montado corretamente.
         config.headers['Authorization'] = `Bearer ${token}`;
       }
     }

@@ -1,19 +1,22 @@
+// src/components/Collections/CollectionsSection.js
+
 'use client';
 
-import React from 'react'; // Removido useEffect e useRef
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-// GSAP e ScrollTrigger foram completamente removidos para resolver o problema de renderização
+import { useFilter } from '@/context/FilterContext'; // Importa o hook do contexto de filtro
 
 import styles from './CollectionsSection.module.css';
 
+// Dados das coleções com IDs ajustados para corresponder ao que o filtro espera
 const collectionData = [
-  { id: 'infantil', name: 'Infantil', description: '3 a 8 anos', iconPath: '/imagens/lapisduplo.svg', bgColorVar: 'var(--doodle-yellow-light)', linkTextColorVar: 'var(--doodle-blue-soft)', },
-  { id: 'juvenil', name: 'Juvenil', description: '9 a 14 anos', iconPath: '/imagens/arcoiris.svg', bgColorVar: 'var(--doodle-green-pastel)', linkTextColorVar: 'var(--doodle-purple-soft)', },
-  { id: 'adulto', name: 'Adulto', description: 'Temas terapêuticos e artísticos', iconPath: '/imagens/sol.svg', bgColorVar: 'var(--doodle-pink-pastel)', linkTextColorVar: 'var(--doodle-blue-soft)', },
-  { id: 'tematico', name: 'Temáticos', description: 'Aventuras e histórias especiais', iconPath: '/imagens/star.svg', bgColorVar: 'var(--doodle-blue-sky)', linkTextColorVar: 'var(--doodle-yellow-mustard)', },
-  { id: 'artigosDiversos', name: 'Artigos Diversos', description: 'Materiais de arte e acessórios', iconPath: '/imagens/estrela2.svg', bgColorVar: 'var(--doodle-purple-light)', linkTextColorVar: 'var(--doodle-green-pastel)', },
+  { id: '1', name: 'Infantil', description: '3 a 8 anos', iconPath: '/imagens/lapisduplo.svg', bgColorVar: 'var(--doodle-yellow-light)', linkTextColorVar: 'var(--doodle-blue-soft)', },
+  { id: '2', name: 'Juvenil', description: '9 a 14 anos', iconPath: '/imagens/arcoiris.svg', bgColorVar: 'var(--doodle-green-pastel)', linkTextColorVar: 'var(--doodle-purple-soft)', },
+  { id: '3', name: 'Adulto', description: 'Temas terapêuticos e artísticos', iconPath: '/imagens/sol.svg', bgColorVar: 'var(--doodle-pink-pastel)', linkTextColorVar: 'var(--doodle-blue-soft)', },
+  { id: '4', name: 'Temáticos', description: 'Aventuras e histórias especiais', iconPath: '/imagens/star.svg', bgColorVar: 'var(--doodle-blue-sky)', linkTextColorVar: 'var(--doodle-yellow-mustard)', },
+  { id: '5', name: 'Artigos Diversos', description: 'Materiais de arte e acessórios', iconPath: '/imagens/estrela2.svg', bgColorVar: 'var(--doodle-purple-light)', linkTextColorVar: 'var(--doodle-green-pastel)', },
 ];
 
 // Variantes de animação do Framer Motion
@@ -38,6 +41,9 @@ const itemVariants = {
 
 
 const CollectionsSection = () => {
+  // Obtém a função para definir a categoria e navegar a partir do contexto
+  const { setCategoryAndNavigate } = useFilter();
+
   return (
     <motion.section 
       className={styles.collectionsSection}
@@ -47,7 +53,7 @@ const CollectionsSection = () => {
       viewport={{ once: true, amount: 0.2 }} // Anima uma vez quando 20% da seção está visível
     >
       <div className={styles.decorativeElements}>
-         {/* ...elementos decorativos... */}
+         {/* Elementos decorativos podem ser adicionados aqui se necessário */}
       </div>
 
       <motion.h2 variants={itemVariants} className={styles.sectionTitle}>
@@ -81,8 +87,14 @@ const CollectionsSection = () => {
             </div>
             <h3 className={styles.collectionName}>{collection.name}</h3>
             <p className={styles.collectionDescription}>{collection.description}</p>
+            {/* 
+              O componente Link agora aponta diretamente para a página do catálogo.
+              O evento onClick é usado para chamar a função do contexto, que irá
+              atualizar o estado global do filtro e depois redirecionar a página.
+            */}
             <Link 
-              href={`/catalog?category=${collection.id}`} 
+              href="/catalog" 
+              onClick={() => setCategoryAndNavigate(collection.id)}
               className={styles.viewCollectionLink} 
               style={{ color: collection.linkTextColorVar }}
             >

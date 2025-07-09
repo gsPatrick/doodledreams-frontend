@@ -1,32 +1,123 @@
+// src/components/Header/Header.js
+
 'use client';
 
+// Adicionar useState, useEffect, useRef para a nova funcionalidade
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
-
+import Image from 'next/image';
 import styles from './Header.module.css';
 import { useCart } from '@/context/CartContext';
-import { useAuth } from '@/context/AuthContext'; 
+import { useAuth } from '@/context/AuthContext';
+import { useFilter } from '@/context/FilterContext';
+import api from '@/services/api';
 
 // React Icons
-import { BsPhone, BsEnvelope, BsSearch, BsPerson, BsPersonFill, BsHeart, BsCart, BsTiktok, BsBoxArrowRight } from 'react-icons/bs';
+import { BsPhone, BsEnvelope, BsSearch, BsPerson, BsPersonFill, BsCart, BsTiktok, BsBoxArrowRight } from 'react-icons/bs';
 import { FaFacebookF, FaInstagram } from 'react-icons/fa';
-import { HiOutlineBars3, HiXMark, HiChevronDown, HiChevronRight } from 'react-icons/hi2';
+import { HiOutlineBars3, HiXMark, HiChevronDown } from 'react-icons/hi2';
 
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 const Header = () => {
   const headerRef = useRef(null);
+  const searchContainerRef = useRef(null); // Ref para o container da busca
+
+  // Estados do Menu Principal e Dropdown
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCatalogDropdownOpen, setIsCatalogDropdownOpen] = useState(false);
+  const [apiCategories, setApiCategories] = useState([]);
+
+  // --- ALTERAÇÃO: Estados para a funcionalidade de busca ---
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false); // Controla visibilidade do dropdown
 
   const { isAuthenticated, user, logout } = useAuth();
   const { cartItems } = useCart();
+  const { setCategoryAndNavigate, clearAllFilters } = useFilter();
   const totalItemsInCart = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+  // --- ALTERAÇÃO: Lógica de busca com Debounce ---
+  useEffect(() => {
+    // Se não há termo de busca, limpa os resultados e para
+    if (!searchTerm.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    // Define um temporizador para aguardar o usuário parar de digitar
+    const debounceTimer = setTimeout(() => {
+      const fetchResults = async () => {
+        setIsSearchLoading(true);
+        try {
+          // Busca na API com o termo e um limite de resultados
+          const response = await api.get('/produtos', {
+            params: {
+              busca: searchTerm,
+              limit: 5, // Limita a 5 resultados para o dropdown
+            },
+          });
+          setSearchResults(response.data.produtos);
+        } catch (error) {
+          console.error('Erro ao buscar produtos:', error);
+          setSearchResults([]);
+        } finally {
+          setIsSearchLoading(false);
+        }
+      };
+      fetchResults();
+    }, 300); // Aguarda 300ms após a última digitação
+
+    // Limpa o temporizador se o usuário digitar novamente
+    return () => clearTimeout(debounceTimer);
+  }, [searchTerm]);
+  
+  // --- ALTERAÇÃO: Efeito para fechar o dropdown ao clicar fora ---
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+        setIsSearchFocused(false);
+      }
+    }
+    // Adiciona o listener
+    document.addEventListener("mousedown", handleClickOutside);
+    // Remove o listener ao desmontar o componente
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [searchContainerRef]);
+
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await api.get('/categorias');
+        const activeCategories = response.data.filter(cat => cat.ativo !== false);
+        setApiCategories(activeCategories);
+      } catch (error) {
+        console.error("Erro ao buscar categorias para o Header:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const handleCategoryClick = (categoryId) => {
+    setCategoryAndNavigate(String(categoryId));
+    setIsCatalogDropdownOpen(false);
+  };
+  
+  const handleViewAllClick = () => {
+    clearAllFilters();
+    setIsCatalogDropdownOpen(false);
+  };
+  
+  const handleResultClick = () => {
+    setSearchTerm('');
+    setSearchResults([]);
+    setIsSearchFocused(false);
+  };
 
   useEffect(() => {
     document.body.style.overflowY = isMenuOpen ? 'hidden' : 'unset';
@@ -34,40 +125,6 @@ const Header = () => {
       document.body.style.overflowY = 'unset';
     };
   }, [isMenuOpen]);
-
-  useEffect(() => {
-    const mainBar = headerRef.current.querySelector(`.${styles.mainBar}`);
-    const navBar = headerRef.current.querySelector(`.${styles.navBar}`);
-
-    const applyScrollEffect = () => {
-      if (window.innerWidth >= 768) {
-        gsap.to([mainBar, navBar], {
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-          backdropFilter: 'blur(8px)',
-          boxShadow: '0 4px 12px -2px rgba(0, 0, 0, 0.15)',
-          ease: 'power1.out',
-          duration: 0.3,
-          scrollTrigger: {
-            trigger: "body",
-            start: "top -=10",
-            end: "top -=11",
-            scrub: true,
-          },
-        });
-      } else {
-        ScrollTrigger.getAll().forEach(st => st.kill());
-        gsap.set([mainBar, navBar], { clearProps: "all" });
-      }
-    };
-    
-    gsap.fromTo(headerRef.current, { y: -200, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", delay: 0.2 });
-    applyScrollEffect();
-    window.addEventListener('resize', applyScrollEffect);
-    return () => {
-      window.removeEventListener('resize', applyScrollEffect);
-      ScrollTrigger.getAll().forEach(st => st.kill());
-    };
-  }, []);
 
   const toggleCatalogDropdown = () => {
     setIsCatalogDropdownOpen(!isCatalogDropdownOpen);
@@ -80,11 +137,18 @@ const Header = () => {
           <div className={styles.dropdownColumn}>
             <h4 className={styles.dropdownColumnTitle}>Por Categoria</h4>
             <ul>
-              <li><Link href="/catalog?category=adulto" className={styles.dropdownLink}>Adulto</Link></li>
-              <li><Link href="/catalog?category=infantil" className={styles.dropdownLink}>Infantil</Link></li>
-              <li><Link href="/catalog?category=juvenil" className={styles.dropdownLink}>Juvenil</Link></li>
-              <li><Link href="/catalog?category=tematico" className={styles.dropdownLink}>Temáticos</Link></li>
-              <li><Link href="/catalog?category=artigosDiversos" className={styles.dropdownLink}>Artigos Diversos</Link></li>
+              <li>
+                <Link href="/catalog" onClick={handleViewAllClick} className={`${styles.dropdownLink} ${styles.viewAllLink}`}>
+                  Ver Todos
+                </Link>
+              </li>
+              {apiCategories.map(category => (
+                <li key={category.id}>
+                  <Link href="/catalog" onClick={() => handleCategoryClick(category.id)} className={styles.dropdownLink}>
+                    {category.nome}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
           <div className={styles.dropdownColumn}>
@@ -132,12 +196,57 @@ const Header = () => {
         <div className={styles.mainBar}>
           <div className={styles.mainBarContent}>
             <Link href="/" className={styles.mainLogo}><span>Doodle Dreams</span></Link>
-            <div className={styles.searchContainer}>
-                <input type="text" placeholder="Buscar livros, coleções..." className={styles.searchInput} />
-                <button className={styles.searchButton} aria-label="Buscar"><BsSearch className={styles.searchIcon} /></button>
+            
+            {/* --- ALTERAÇÃO: Wrapper para a busca --- */}
+            <div className={styles.searchContainerWrapper} ref={searchContainerRef}>
+                <div className={styles.searchContainer}>
+                    <input 
+                        type="text" 
+                        placeholder="Buscar livros, coleções..." 
+                        className={styles.searchInput}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onFocus={() => setIsSearchFocused(true)} // Abre o dropdown ao focar
+                    />
+                    <button className={styles.searchButton} aria-label="Buscar"><BsSearch className={styles.searchIcon} /></button>
+                </div>
+
+                {/* --- ALTERAÇÃO: Dropdown de resultados da busca --- */}
+                <AnimatePresence>
+                {isSearchFocused && searchTerm && (
+                    <motion.div 
+                        className={styles.searchResultsDropdown}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                    >
+                        {isSearchLoading ? (
+                            <div className={styles.searchStatusMessage}>Buscando...</div>
+                        ) : searchResults.length > 0 ? (
+                            searchResults.map(product => (
+                                <Link href={`/${product.slug}`} key={product.id} className={styles.searchResultItem} onClick={handleResultClick}>
+                                    <Image 
+                                        src={product.imagens?.[0] || 'https://placehold.co/50x50.png'} 
+                                        alt={product.nome}
+                                        width={50}
+                                        height={50}
+                                        className={styles.searchResultImage}
+                                    />
+                                    <div className={styles.searchResultInfo}>
+                                        <span className={styles.searchResultName}>{product.nome}</span>
+                                        <span className={styles.searchResultPrice}>R$ {product.variacoes?.[0]?.preco || '0.00'}</span>
+                                    </div>
+                                </Link>
+                            ))
+                        ) : (
+                            <div className={styles.searchStatusMessage}>Nenhum resultado encontrado.</div>
+                        )}
+                    </motion.div>
+                )}
+                </AnimatePresence>
             </div>
+
             <div className={styles.mainActionIcons}>
-              {/* CORREÇÃO: Links de conta e favoritos agora escondidos em mobile */ }
               <Link href={isAuthenticated ? "/my-account" : "/auth"} className={`${styles.mainActionLink} ${styles.hideOnMobile} ${isAuthenticated ? styles.loggedInUser : ''}`}>
                 {isAuthenticated ? <BsPersonFill className={styles.mainIcon} /> : <BsPerson className={styles.mainIcon} />}
                 <span>{isAuthenticated ? `Olá, ${user.nome.split(' ')[0]}` : 'Entrar'}</span>
@@ -150,8 +259,6 @@ const Header = () => {
                 </button>
               )}
               
-              
-              {/* Carrinho permanece visível em todas as telas */}
               <Link href="/cart" className={styles.mainActionLink}>
                 <div className={styles.cartIconWrapper}>
                   <BsCart className={styles.mainIcon} />
@@ -159,7 +266,6 @@ const Header = () => {
                     <span className={styles.cartBadge}>{totalItemsInCart}</span>
                   )}
                 </div>
-                {/* O texto "Carrinho" será escondido via CSS no mobile */}
                 <span>Carrinho</span>
               </Link>
               
@@ -211,7 +317,6 @@ const Header = () => {
                         ))}
                     </ul>
                 </nav>
-                {/* CORREÇÃO: Links de Conta e Sair adicionados aqui dentro do menu */ }
                 <div className={styles.menuActionLinks}>
                   <Link href={isAuthenticated ? "/my-account" : "/auth"} className={styles.menuActionLink} onClick={() => setIsMenuOpen(false)}>
                     {isAuthenticated ? <BsPersonFill className={styles.menuActionIcon} /> : <BsPerson className={styles.menuActionIcon} />}

@@ -1,3 +1,5 @@
+// src/components/ProductCard/ProductCard.js
+
 'use client';
 
 import React from 'react';
@@ -5,63 +7,69 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import styles from './ProductCard.module.css';
+import { BsHeart } from 'react-icons/bs';
 
-const buttonColors = {
-  blue: 'var(--doodle-purple-soft)',
-  purple: 'var(--doodle-pink-pastel)',
-  hoverBlue: 'var(--doodle-purple-light)',
-  hoverPurple: 'var(--doodle-purple-soft)',
-};
-
-const ProductCard = ({ product }) => {
-  const handleAddToCart = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log(`Adicionar ${product.name} ao carrinho!`);
+const ProductCard = ({ product, index }) => {
+  const cardVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: 'spring',
+        stiffness: 100,
+        damping: 12,
+        delay: index * 0.1
+      }
+    }
   };
 
-  const numericPrice = Number(product.price) || 0;
-  // Define uma cor padrão caso a prop não seja passada
-  const colorKey = product.buttonColor === 'purple' ? 'purple' : 'blue';
-  const currentButtonColor = buttonColors[colorKey];
-  const hoverButtonColor = buttonColors[`hover${colorKey.charAt(0).toUpperCase() + colorKey.slice(1)}`];
+  // --- LÓGICA DE DADOS ROBUSTA ---
+
+  // 1. Encontrar a URL da imagem:
+  //    - Prioridade 1: `product.imageSrc` (se já foi formatado antes)
+  //    - Prioridade 2: `product.imagens[0]` (formato direto da sua API)
+  //    - Fallback: Um placeholder
+  const imageSrc = product.imageSrc || product.imagens?.[0] || 'https://placehold.co/400x400.png';
+
+  // 2. Encontrar o Preço:
+  //    - Prioridade 1: Preço da primeira variação, se existir.
+  //    - Prioridade 2: Preço direto do objeto `product` (se já foi formatado antes).
+  //    - Fallback: 0.00
+  const firstVariation = product.variacoes?.[0];
+  const priceAsNumber = Number(firstVariation?.preco) || Number(product.price) || 0;
+  const formattedPrice = priceAsNumber.toFixed(2).replace('.', ',');
 
   return (
     <motion.div
+      variants={cardVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
       className={styles.productCard}
-      whileHover={{ y: -5, boxShadow: "0 15px 30px rgba(0, 0, 0, 0.1)" }}
-      transition={{ type: "spring", stiffness: 300, damping: 15 }}
     >
-      <Link href={`/product/${product.slug}`} className={styles.productLink}>
+      <Link href={`/product/${product.slug || product.id}`} className={styles.productLink}>
         {product.isNew && <span className={styles.newBadge}>Novo!</span>}
         
         <div className={styles.productImageContainer}>
           <Image
-            src={product.imageSrc}
-            alt={product.name}
+            src={imageSrc} // Usa a URL encontrada
+            alt={product.name || 'Produto'}
             fill
-            sizes="(max-width: 600px) 100vw, (max-width: 1200px) 33vw, 20vw"
+            sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw"
             className={styles.productImage}
           />
         </div>
 
         <div className={styles.productInfo}>
-          <h3 className={styles.productName}>{product.name}</h3>
-          <p className={styles.productPrice}>R$ {numericPrice.toFixed(2).replace('.', ',')}</p>
+            <h3 className={styles.productName}>{product.name || 'Nome Indisponível'}</h3>
+            <p className={styles.productPrice}>R$ {formattedPrice}</p>
         </div>
       </Link>
 
-      <motion.button
-        className={styles.addToCartButton}
-        style={{ backgroundColor: currentButtonColor, borderColor: currentButtonColor }}
-        whileHover={{ backgroundColor: hoverButtonColor, borderColor: hoverButtonColor, scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        transition={{ type: "spring", stiffness: 400, damping: 10 }}
-        onClick={handleAddToCart}
-        aria-label={`Adicionar ${product.name} ao carrinho`}
-      >
-        Adicionar ao Carrinho
-      </motion.button>
+      <div className={styles.cardActions}>
+          {/* Botões de Ação (adicionar ao carrinho, etc.) podem ser adicionados aqui */}
+      </div>
     </motion.div>
   );
 };

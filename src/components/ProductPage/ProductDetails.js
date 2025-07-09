@@ -1,16 +1,46 @@
+// src/components/ProductPage/ProductDetails.js
+
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './ProductDetails.module.css';
 import { motion } from 'framer-motion';
-import { BsCartPlus, BsHeart, BsDash, BsPlus, BsCheckLg } from 'react-icons/bs';
+import { useRouter } from 'next/navigation'; // 1. Importar o useRouter para o redirecionamento
+import { BsCartPlus, BsHeart, BsHeartFill, BsDash, BsPlus, BsCheckLg } from 'react-icons/bs';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
+import api from '@/services/api';
 
 const ProductDetails = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
-  // Garante que a primeira variação seja selecionada por padrão
   const [selectedVariation, setSelectedVariation] = useState(product.variations[0]);
-  const [added, setAdded] = useState(false); // Estado para feedback visual
+  const [added, setAdded] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isLoadingFavorite, setIsLoadingFavorite] = useState(true);
+
   const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
+  const router = useRouter(); // 2. Instanciar o router
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      setIsLoadingFavorite(true);
+      api.get(`/favoritos/verificar/${product.id}`)
+        .then(response => {
+          setIsFavorite(response.data.isFavorito);
+        })
+        .catch(error => {
+          console.error("Erro ao verificar favorito:", error);
+          setIsFavorite(false);
+        })
+        .finally(() => {
+          setIsLoadingFavorite(false);
+        });
+    } else {
+      setIsFavorite(false);
+      setIsLoadingFavorite(false);
+    }
+  }, [isAuthenticated, product.id]);
+
 
   const handleQuantityChange = (amount) => {
     setQuantity((prev) => Math.max(1, prev + amount));
@@ -20,17 +50,43 @@ const ProductDetails = ({ product }) => {
     setSelectedVariation(variation);
   };
 
+  // Função para o botão "Adicionar ao Carrinho" (continua na página)
   const handleAddToCart = () => {
-    // O addToCart agora espera um objeto 'product' completo
-    // que já inclui as imagens e outras infos necessárias
     addToCart(product, quantity, selectedVariation);
-    
-    // Feedback visual para o usuário
     setAdded(true);
-    setTimeout(() => {
-      setAdded(false);
-    }, 2500); // O botão volta ao normal após 2.5 segundos
+    setTimeout(() => setAdded(false), 2500);
   };
+
+  // 3. Nova função para o botão "Comprar Agora" (adiciona e redireciona)
+  const handleBuyNow = () => {
+    addToCart(product, quantity, selectedVariation);
+    // Redireciona para a página do carrinho
+    router.push('/cart');
+  };
+
+  const handleToggleFavorite = async () => {
+    if (!isAuthenticated) {
+      alert("Você precisa estar logado para adicionar produtos aos favoritos.");
+      return;
+    }
+
+    setIsLoadingFavorite(true);
+    try {
+      if (isFavorite) {
+        await api.delete(`/favoritos/${product.id}`);
+        setIsFavorite(false);
+      } else {
+        await api.post('/favoritos', { produtoId: product.id });
+        setIsFavorite(true);
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar favoritos:", error.response?.data?.erro || error.message);
+      alert("Ocorreu um erro ao atualizar sua lista de desejos. Tente novamente.");
+    } finally {
+      setIsLoadingFavorite(false);
+    }
+  };
+
 
   return (
     <div className={styles.detailsContainer}>
@@ -89,12 +145,25 @@ const ProductDetails = ({ product }) => {
         </motion.button>
       </div>
 
-      <motion.button 
-        className={styles.wishlistButton}
+      {/* 4. Adicionar o novo botão "Comprar Agora" logo abaixo do wrapper de ações */}
+      <motion.button
+        className={styles.buyNowButton}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.98 }}
+        onClick={handleBuyNow}
       >
-        <BsHeart /> Adicionar à Lista de Desejos
+        Comprar Agora
+      </motion.button>
+
+      <motion.button 
+        className={`${styles.wishlistButton} ${isFavorite ? styles.isFavorite : ''}`}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.98 }}
+        onClick={handleToggleFavorite}
+        disabled={isLoadingFavorite}
+      >
+        {isFavorite ? <BsHeartFill /> : <BsHeart />}
+        {isLoadingFavorite ? 'Carregando...' : (isFavorite ? 'Remover da Lista de Desejos' : 'Adicionar à Lista de Desejos')}
       </motion.button>
     </div>
   );

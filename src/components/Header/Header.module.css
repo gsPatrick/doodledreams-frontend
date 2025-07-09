@@ -1,16 +1,11 @@
 /* src/components/Header/Header.module.css */
 
-/* --- Header Wrapper (o container geral) --- */
+/* --- Header Wrapper --- */
 .header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 50;
-  background-color: transparent;
+  top: 0; left: 0; right: 0; z-index: 50; background-color: transparent;
 }
 
-/* --- Top Bar (para Desktop) --- */
+/* --- Top Bar --- */
 .topBarWrapper { display: block; }
 .topBar { background-color: var(--doodle-dark-grey); padding: 0.5rem 0; }
 .topBarContent { max-width: 1280px; margin-left: auto; margin-right: auto; padding: 0 1.5rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; }
@@ -21,17 +16,91 @@
 .topBarSocialLink { color: var(--doodle-light-text-on-dark); font-size: 1.2rem; transition: color 0.2s ease; }
 .topBarSocialLink:hover { color: var(--doodle-pink-pastel); }
 
-/* --- Main Bar (Logo, Busca, Ícones de Conta) --- */
-.mainBar { background-color: var(--doodle-white); padding: 1rem 0; border-bottom: 1px solid var(--doodle-input-border); display: flex; align-items: center; transition: background-color 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease; }
+/* --- Main Bar --- */
+.mainBar { background-color: var(--doodle-white); padding: 1rem 0; border-bottom: 1px solid var(--doodle-input-border); display: flex; align-items: center; }
 .mainBarContent { max-width: 1280px; margin-left: auto; margin-right: auto; padding: 0 1.5rem; display: flex; justify-content: space-between; align-items: center; width: 100%; }
 .mainLogo { font-family: var(--font-mali-next); font-size: 2.5rem; font-weight: 700; color: var(--doodle-dark-grey); transition: color 0.3s ease; white-space: nowrap; }
 .mainLogo:hover { color: var(--doodle-blue-soft); }
-.searchContainer { display: flex; align-items: center; flex-grow: 1; max-width: 400px; border: 1px solid var(--doodle-input-border); border-radius: 9999px; overflow: hidden; margin: 0 2rem; }
+
+/* --- ALTERAÇÃO: Estilos para o Container da Busca e Resultados --- */
+.searchContainerWrapper {
+  position: relative; /* Essencial para posicionar o dropdown de resultados */
+  flex-grow: 1;
+  max-width: 400px;
+  margin: 0 2rem;
+}
+
+.searchContainer { display: flex; align-items: center; border: 1px solid var(--doodle-input-border); border-radius: 9999px; overflow: hidden; width: 100%; }
 .searchInput { flex-grow: 1; padding: 0.75rem 1.25rem; border: none; outline: none; font-size: 1rem; color: var(--doodle-purple-soft); background-color: transparent; }
 .searchInput::placeholder { color: var(--doodle-placeholder-text); }
 .searchButton { background-color: var(--doodle-purple-light); color: var(--doodle-white); padding: 0.75rem 1.25rem; border: none; cursor: pointer; transition: background-color 0.2s ease; }
 .searchButton:hover { background-color: var(--doodle-blue-soft); }
 .searchIcon { width: 1.25rem; height: 1.25rem; color: var(--doodle-white); }
+
+/* Dropdown de Resultados da Busca */
+.searchResultsDropdown {
+  position: absolute;
+  top: calc(100% + 8px); /* 8px abaixo da barra de busca */
+  left: 0;
+  right: 0;
+  background-color: var(--doodle-white);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  border: 1px solid var(--doodle-input-border);
+  z-index: 10;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.searchResultItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.searchResultItem:hover {
+  background-color: var(--doodle-beige-light);
+}
+
+.searchResultItem:not(:last-child) {
+  border-bottom: 1px solid var(--doodle-beige-light);
+}
+
+.searchResultImage {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0; /* Impede que a imagem encolha */
+}
+
+.searchResultInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.searchResultName {
+  font-family: var(--font-mali-next);
+  font-weight: 600;
+  color: var(--doodle-dark-grey);
+  font-size: 1rem;
+}
+
+.searchResultPrice {
+  font-size: 0.9rem;
+  color: var(--doodle-purple-soft);
+}
+
+.searchStatusMessage {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--doodle-placeholder-text);
+  font-style: italic;
+}
+
 
 /* Main Action Icons */
 .mainActionIcons { display: flex; align-items: center; gap: 1.5rem; }
@@ -47,8 +116,8 @@
 .cartIconWrapper { position: relative; display: flex; flex-direction: column; align-items: center; }
 .cartBadge { position: absolute; top: -5px; right: -8px; background-color: var(--doodle-pink-pastel); color: var(--doodle-white); border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; border: 1px solid var(--doodle-white); }
 
-/* --- Nav Bar (Desktop) --- */
-.navBar { background-color: var(--doodle-white); padding: 1rem 0; border-bottom: 1px solid var(--doodle-input-border); display: block; transition: background-color 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease; }
+/* --- Nav Bar --- */
+.navBar { background-color: var(--doodle-white); padding: 1rem 0; border-bottom: 1px solid var(--doodle-input-border); display: block; }
 .navBarContent { max-width: 1280px; margin-left: auto; margin-right: auto; padding: 0 1.5rem; }
 .nav { display: block; }
 .navList { display: flex; list-style: none; padding: 0; margin: 0; justify-content: center; gap: 2.5rem; }
@@ -69,6 +138,7 @@
 .dropdownColumn li { margin-bottom: 0.6rem; }
 .dropdownLink { font-family: var(--font-mali-next); font-size: 1.05rem; color: var(--doodle-dark-grey); transition: color 0.2s ease; text-decoration: none; display: block; padding: 0.2rem 0; }
 .dropdownLink:hover { color: var(--doodle-blue-soft); }
+.viewAllLink { font-weight: 700; color: var(--doodle-blue-soft); margin-bottom: 0.5rem !important; padding-bottom: 0.5rem !important; border-bottom: 1px dashed var(--doodle-input-border); }
 
 /* Logout Button */
 .logoutButton { background: none; border: none; padding: 0; cursor: pointer; color: var(--doodle-pink-pastel); }
@@ -76,15 +146,17 @@
 .logoutButton .mainIcon { color: var(--doodle-pink-pastel); }
 .logoutButton:hover .mainIcon { color: #d9466b; }
 
-
 /* --- RESPONSIVIDADE (MOBILE) --- */
 @media (max-width: 767px) {
-  .topBarWrapper, .searchContainer, .navBar, .hideOnMobile { display: none; }
+  .header { position: fixed; }
+  .topBarWrapper, .navBar, .hideOnMobile { display: none; }
+  /* Oculta a busca de desktop e mostra uma de mobile, se necessário */
+  .searchContainerWrapper { display: none; } 
   .mobileMenuButton { display: block; margin-left: 0; }
   .mainBarContent { padding: 0 1rem; }
   .mainActionIcons { gap: 1.2rem; }
-  .mainLogo { font-size: 1.5rem; } /* Tamanho do logo reduzido */
-  .mainActionLink span { display: none; } /* Esconde texto dos ícones */
+  .mainLogo { font-size: 1.5rem; }
+  .mainActionLink span { display: none; }
   .mainIcon { margin-bottom: 0; }
 }
 
@@ -99,8 +171,6 @@
 .menuNavItem { margin-bottom: 1rem; }
 .menuNavLink { font-family: var(--font-mali-next); font-size: 1.25rem; color: var(--doodle-purple-soft); text-decoration: none; display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; transition: color 0.2s ease; }
 .menuNavLink:hover { color: var(--doodle-blue-soft); }
-
-/* CORREÇÃO: Estilos para links de ação dentro do menu */
 .menuActionLinks { display: flex; flex-direction: column; gap: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--doodle-input-border); margin-top: 2rem; }
 .menuActionLink { display: flex; align-items: center; gap: 0.75rem; font-family: var(--font-mali-next); font-size: 1.1rem; color: var(--doodle-purple-soft); text-decoration: none; transition: color 0.2s ease; background: none; border: none; padding: 0; cursor: pointer; text-align: left; width: 100%; }
 .menuActionLink:hover { color: var(--doodle-blue-soft); }

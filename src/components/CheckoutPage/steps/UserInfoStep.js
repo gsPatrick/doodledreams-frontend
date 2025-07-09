@@ -38,7 +38,6 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
   const [cepError, setCepError] = useState('');
 
 
-  // Efeito para determinar o que mostrar inicialmente
   useEffect(() => {
     if (!isAuthLoading) {
       if (isAuthenticated) {
@@ -98,7 +97,7 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
           ...prev,
           rua: response.data.logradouro,
           bairro: response.data.bairro,
-          cidade: response.data.localidade, 
+          cidade: response.data.localidade,
           estado: response.data.uf, 
           complemento: response.data.complemento || '',
         }));
@@ -137,14 +136,15 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
     setRegisterError(''); 
   };
 
-  // Lógica de Login
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setIsProcessingAuth(true);
     setLoginError('');
     try {
       const response = await api.post('/auth/login', loginCreds);
-      authLogin(response.data.usuario, response.data.token);
+      // --- ALTERAÇÃO AQUI ---
+      // Passamos `null` como terceiro argumento para IMPEDIR o redirecionamento.
+      authLogin(response.data.usuario, response.data.token, null);
       onLoginOrRegisterSuccess(); 
     } catch (err) {
       setLoginError(err.response?.data?.erro || 'Credenciais inválidas. Tente novamente.');
@@ -153,14 +153,15 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
     }
   };
 
-  // Lógica de Cadastro
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setIsProcessingAuth(true);
     setRegisterError('');
     try {
       const response = await api.post('/auth/register', registerCreds);
-      authLogin(response.data.usuario, response.data.token);
+      // --- ALTERAÇÃO AQUI ---
+      // Passamos `null` como terceiro argumento para IMPEDIR o redirecionamento.
+      authLogin(response.data.usuario, response.data.token, null);
       onLoginOrRegisterSuccess(); 
     } catch (err) {
       setRegisterError(err.response?.data?.erro || 'Erro no cadastro. Tente novamente.');
@@ -169,7 +170,6 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
     }
   };
 
-  // Lógica para enviar o formulário de endereço (para logados ou não logados)
   const handleAddressFormSubmit = async (e) => {
     e.preventDefault();
     setAddressFormError('');
@@ -178,17 +178,13 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
     let userContactData = null; 
 
     if (isAuthenticated) {
-        // Usuário logado: Pode ter selecionado existente ou preenchido novo
         const selectedId = e.target.elements['address-selection']?.value; 
 
         if (userAddresses.length > 0 && selectedId && selectedId !== 'new_address') {
-            // Selecionou um endereço existente
             const selectedAddress = userAddresses.find(addr => addr.id == selectedId);
             if (selectedAddress) {
-                 // Tenta definir como principal no backend (opcional)
                 if (!selectedAddress.principal) {
                     try {
-                         // API call para definir como principal
                         await api.post(`/enderecos/${selectedAddress.id}/principal`);
                     } catch (error) {
                         console.warn("Falha ao definir endereço como principal:", error);
@@ -200,8 +196,6 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
                 return;
             }
         } else {
-            // Selecionou "Adicionar Novo" OU não tinha endereços
-            // Valida os campos do formulário manual
              if (!addressFormData.rua || !addressFormData.numero || !addressFormData.bairro || !addressFormData.cidade || !addressFormData.estado || !addressFormData.cep) {
                  setAddressFormError('Por favor, preencha todos os campos obrigatórios do endereço.');
                  return;
@@ -211,7 +205,6 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
                   return;
              }
 
-            // Tenta criar o novo endereço no backend para o usuário logado
             setIsProcessingAuth(true); 
             try {
                  const newAddressPayload = { 
@@ -231,7 +224,6 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
             }
         }
 
-        // Para usuário logado, os dados de contato vêm do authUser
         userContactData = {
              email: authUser?.email,
              nome: authUser?.nome,
@@ -239,7 +231,6 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
 
 
     } else {
-        // Usuário NÃO logado: Usa os dados do formulário manual de endereço E dados de contato
         if (!registerCreds.nome || !registerCreds.email || !addressFormData.rua || !addressFormData.numero || !addressFormData.bairro || !addressFormData.cidade || !addressFormData.estado || !addressFormData.cep) {
              setAddressFormError('Por favor, preencha todos os dados de contato e endereço.');
              return;
@@ -250,13 +241,12 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
          }
 
         finalAddressData = addressFormData; 
-        userContactData = { // Pega nome/email dos credenciais de cadastro
+        userContactData = {
             nome: registerCreds.nome,
             email: registerCreds.email,
         };
     }
 
-     // Combina dados de contato e endereço. Este é o objeto que representa o usuário E o endereço no checkout
      onComplete({
          ...userContactData, 
          ...finalAddressData 
@@ -330,7 +320,7 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
                 <label htmlFor="register-senha">Crie uma Senha</label>
                 <input type="password" id="register-senha" name="senha" value={registerCreds.senha} onChange={handleRegisterCredsChange} required />
               </div>
-              {registerError && <p className={styles.errorMessage}>{registerError}</p>}_
+              {registerError && <p className={styles.errorMessage}>{registerError}</p>}
               <button type="submit" className={styles.loginButton} disabled={isProcessingAuth}>
                 {isProcessingAuth ? 'Cadastrando...' : 'Criar Conta'}
               </button>
@@ -340,7 +330,6 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
       </>
     );
   } else { 
-    // Logado OU não logado MAS showAuthForms é false
     content = (
       <form onSubmit={handleAddressFormSubmit}>
         <h4 className={styles.subheading}>Informações de Contato e Endereço de Entrega</h4>
@@ -452,7 +441,6 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
 
   return (
     <AnimatePresence mode="wait">
-       {/* Chave baseada se está logado/mostrando forms de auth para animação correta */}
        <motion.div key={isAuthenticated ? "authenticatedFlow" : (showAuthForms ? "authForms" : "addressFormOnly")} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
          {content}
        </motion.div>

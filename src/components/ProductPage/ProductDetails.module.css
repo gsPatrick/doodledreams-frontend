@@ -1,3 +1,5 @@
+/* src/components/ProductPage/ProductDetails.module.css */
+
 .detailsContainer { padding-left: 2rem; }
 .productTitle { font-family: var(--font-mali-next); font-size: 2.8rem; font-weight: 800; color: var(--doodle-dark-grey); margin-bottom: 0.5rem; }
 .productPrice { font-family: var(--font-mali-next); font-size: 2rem; font-weight: 700; color: var(--doodle-purple-soft); margin-bottom: 1.5rem; }
@@ -18,7 +20,7 @@
 }
 .variationItem.active {
     border-color: var(--doodle-purple-soft);
-    background-color: #f3f5fe; /* Fundo azul claro sutil */
+    background-color: #f3f5fe;
     box-shadow: 0 4px 12px rgba(144, 122, 204, 0.1);
 }
 .variationRadio {
@@ -66,6 +68,28 @@
   cursor: not-allowed;
 }
 
+/* --- ESTILO PARA O NOVO BOTÃO "COMPRAR AGORA" --- */
+.buyNowButton {
+  width: 100%;
+  padding: 1rem;
+  margin-top: 1rem; /* Espaçamento entre ele e o botão "Adicionar ao Carrinho" */
+  border-radius: 99px;
+  border: 2px solid var(--doodle-blue-soft); /* Borda com cor de destaque */
+  background-color: transparent; /* Fundo transparente */
+  color: var(--doodle-blue-soft); /* Cor do texto */
+  font-family: var(--font-mali-next);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.buyNowButton:hover {
+  background-color: var(--doodle-blue-soft); /* Preenche o fundo no hover */
+  color: white; /* Muda a cor do texto no hover */
+}
+
+
 .wishlistButton { 
     display: flex; 
     align-items: center; 
@@ -76,17 +100,32 @@
     font-family: sans-serif;
     font-weight: 600; 
     cursor: pointer;
-    margin-top: 1rem;
+    margin-top: 1.5rem; /* Aumenta a margem para separar do botão "Comprar Agora" */
     padding: 0.5rem;
+    transition: color 0.2s ease;
 }
 
-/* CORREÇÃO: Ajustes para responsividade */
+.wishlistButton.isFavorite {
+    color: var(--doodle-pink-pastel);
+}
+
+.wishlistButton:hover {
+    color: var(--doodle-purple-soft);
+}
+
+.wishlistButton.isFavorite:hover {
+    color: var(--doodle-pink-pastel);
+    filter: brightness(0.9);
+}
+
+
+/* --- RESPONSIVIDADE --- */
 @media (max-width: 991px) {
     .detailsContainer {
-        padding-left: 0; /* Remove o padding para centralizar */
+        padding-left: 0;
     }
     .productTitle {
-        font-size: 2.2rem; /* Reduz o título para mobile */
+        font-size: 2.2rem;
         text-align: center;
     }
     .productPrice {
@@ -98,10 +137,14 @@
         max-width: 100%;
     }
     .actionsWrapper {
-        flex-direction: column; /* Empilha o seletor de quantidade e o botão */
+        flex-direction: column;
+    }
+    .buyNowButton {
+        margin-top: 0.75rem; /* Ajusta a margem no mobile */
     }
     .wishlistButton {
-        justify-content: center; /* Centraliza o botão de wishlist */
+        justify-content: center;
         width: 100%;
+        margin-top: 1rem;
     }
 }

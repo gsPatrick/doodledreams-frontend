@@ -1,11 +1,14 @@
+// src/app/layout.js
+
 import { Mali, Sacramento } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 import { CartProvider } from '@/context/CartContext';
-import { AuthProvider } from '@/context/AuthContext'; // <-- Importa o novo provider
+import { AuthProvider } from '@/context/AuthContext';
+import { FilterProvider } from '@/context/FilterContext'; // <-- 1. Importar o novo provider
 
-// Configuração original e correta das fontes
+// Configuração das fontes (sem alteração)
 const mali = Mali({
   subsets: ['latin'],
   weight: ['200', '300', '400', '500', '600', '700'],
@@ -27,7 +30,6 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    // A declaração da `lang` e das variáveis CSS está correta aqui
     <html lang="pt-BR"
           style={{
             '--font-mali-next': mali.style.fontFamily,
@@ -35,12 +37,14 @@ export default function RootLayout({ children }) {
           }}
     >
       <body>
-        {/* A ordem dos providers é importante: AuthProvider por fora */}
         <AuthProvider>
           <CartProvider>
-            <Header />
-            <main>{children}</main>
-            <Footer />
+            {/* 2. Envolver com o FilterProvider */}
+            <FilterProvider>
+              <Header />
+              <main>{children}</main>
+              <Footer />
+            </FilterProvider>
           </CartProvider>
         </AuthProvider>
       </body>

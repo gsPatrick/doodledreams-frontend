@@ -490,3 +490,110 @@
 }
 
 /* ... (o restante dos seus estilos) ... */
+
+/* No seu arquivo CartPage.module.css */
+
+/* Estilo do item do carrinho principal */
+.cartItem {
+  display: flex;
+  align-items: center; /* Alinha tudo verticalmente */
+  gap: 1.5rem; /* Espaçamento entre link, ações, etc. */
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--doodle-input-border);
+}
+
+/* 1. Novo wrapper para o link que agrupa imagem e detalhes */
+.itemLinkWrapper {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  text-decoration: none;
+  color: inherit;
+  flex-grow: 1; /* Faz o link ocupar o máximo de espaço possível */
+  transition: opacity 0.2s ease;
+}
+
+.itemLinkWrapper:hover {
+  opacity: 0.8; /* Efeito de hover sutil */
+}
+
+/* Container da imagem */
+.itemImageWrapper {
+  flex-shrink: 0; /* Impede que a imagem encolha */
+}
+
+.itemImage {
+  border-radius: 8px;
+  display: block;
+}
+
+/* Detalhes do produto (nome e variação) */
+.itemDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.itemName {
+  font-family: var(--font-mali-next);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+}
+
+.itemVariation {
+  font-size: 0.9rem;
+  color: var(--doodle-placeholder-text);
+  margin: 0;
+}
+
+/* 2. Novo container para as ações, mantendo-as alinhadas */
+.itemActions {
+  display: flex;
+  flex-direction: column; /* Empilha quantidade, preço e botão de remover */
+  align-items: flex-end; /* Alinha tudo à direita */
+  gap: 0.75rem;
+  flex-shrink: 0; /* Impede que o container de ações encolha */
+}
+
+/* Seletor de quantidade */
+.quantitySelector {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--doodle-input-border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.quantitySelector button {
+  background: none;
+  border: none;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--doodle-purple-soft);
+}
+
+.quantitySelector span {
+  padding: 0 0.5rem;
+  font-weight: 600;
+}
+
+/* Preço do item */
+.itemPrice {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--doodle-dark-grey);
+  margin: 0;
+}
+
+/* Botão de remover */
+.removeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--doodle-pink-pastel);
+  font-size: 1.2rem;
+  padding: 0.25rem;
+  line-height: 1;
+}
