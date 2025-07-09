@@ -21,13 +21,13 @@ const HeaderTopBar = () => {
           </a>
         </div>
         <div className={styles.topBarSocial}>
-          <a href="#" className={styles.topBarSocialLink} aria-label="TikTok">
+          <a href="https://www.tiktok.com/@doodle.dreams14?_t=ZM-8xq6di3BCFS&_r=1" className={styles.topBarSocialLink} aria-label="TikTok">
             <BsTiktok />
           </a>
-          <a href="#" className={styles.topBarSocialLink} aria-label="Facebook">
+          <a href="https://www.facebook.com/profile.php?id=61578009051256&mibextid=wwXIfr&mibextid=wwXIfr" className={styles.topBarSocialLink} aria-label="Facebook">
             <FaFacebookF />
           </a>
-          <a href="#" className={styles.topBarSocialLink} aria-label="Instagram">
+          <a href="https://www.facebook.com/profile.php?id=61578009051256&mibextid=wwXIfr&mibextid=wwXIfr" className={styles.topBarSocialLink} aria-label="Instagram">
             <FaInstagram />
           </a>
         </div>

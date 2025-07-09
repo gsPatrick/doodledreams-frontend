@@ -103,9 +103,9 @@ const OffCanvasMenu = ({ isOpen, onClose }) => {
               <BsEnvelope className={styles.menuContactIcon} /> contato@doodledreams.com.br
             </a>
             <div className={styles.menuSocialLinks}>
-              <a href="#" className={styles.menuSocialLink} aria-label="TikTok"><BsTiktok /></a>
-              <a href="#" className={styles.menuSocialLink} aria-label="Facebook"><FaFacebookF /></a>
-              <a href="#" className={styles.menuSocialLink} aria-label="Instagram"><FaInstagram /></a>
+              <a href="https://www.tiktok.com/@doodle.dreams14?_t=ZM-8xq6di3BCFS&_r=1" className={styles.menuSocialLink} aria-label="TikTok"><BsTiktok /></a>
+              <a href="https://www.facebook.com/profile.php?id=61578009051256&mibextid=wwXIfr&mibextid=wwXIfr" className={styles.menuSocialLink} aria-label="Facebook"><FaFacebookF /></a>
+              <a href="https://www.facebook.com/profile.php?id=61578009051256&mibextid=wwXIfr&mibextid=wwXIfr" className={styles.menuSocialLink} aria-label="Instagram"><FaInstagram /></a>
             </div>
           </div>
         </div>

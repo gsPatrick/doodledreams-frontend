@@ -185,9 +185,9 @@ const Header = () => {
                         <a href="mailto:contato@doodledreams.com.br" className={styles.topBarLink}><BsEnvelope className={styles.topBarIcon} /><span>contato@doodledreams.com.br</span></a>
                     </div>
                     <div className={styles.topBarSocial}>
-                        <a href="#" className={styles.topBarSocialLink} aria-label="TikTok"><BsTiktok /></a>
-                        <a href="#" className={styles.topBarSocialLink} aria-label="Facebook"><FaFacebookF /></a>
-                        <a href="#" className={styles.topBarSocialLink} aria-label="Instagram"><FaInstagram /></a>
+                        <a href="https://www.tiktok.com/@doodle.dreams14?_t=ZM-8xq6di3BCFS&_r=1" className={styles.topBarSocialLink} aria-label="TikTok"><BsTiktok /></a>
+                        <a href="https://www.facebook.com/profile.php?id=61578009051256&mibextid=wwXIfr&mibextid=wwXIfr" className={styles.topBarSocialLink} aria-label="Facebook"><FaFacebookF /></a>
+                        <a href="https://www.instagram.com/doodle_dreams.colorir?igsh=eGNsbHFjeDV0azlq" className={styles.topBarSocialLink} aria-label="Instagram"><FaInstagram /></a>
                     </div>
                 </div>
             </div>

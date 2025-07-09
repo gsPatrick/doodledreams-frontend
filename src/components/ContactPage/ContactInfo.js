@@ -4,7 +4,7 @@ import React from 'react';
 import styles from './ContactPage.module.css';
 import { motion } from 'framer-motion';
 // CORREÇÃO: Importando cada ícone da sua biblioteca correta. BsPinterestP vem de 'fa'.
-import { BsEnvelope, BsPhone, BsPinMap, BsInstagram } from 'react-icons/bs';
+import { BsEnvelope, BsPhone, BsPinMap, BsTiktok } from 'react-icons/bs';
 import { FaFacebookF, FaPinterestP } from 'react-icons/fa';
 
 const contactMethods = [
@@ -14,9 +14,9 @@ const contactMethods = [
 ];
 
 const socialLinks = [
-  { icon: <BsInstagram />, label: "Instagram", href: "#" },
-  { icon: <FaFacebookF />, label: "Facebook", href: "#" }, // Corrigido para usar o ícone importado corretamente
-  { icon: <FaPinterestP />, label: "Pinterest", href: "#" } // Corrigido para usar o ícone importado corretamente
+  { icon: <BsInstagram />, label: "Instagram", href: "https://www.instagram.com/doodle_dreams.colorir?igsh=eGNsbHFjeDV0azlq" },
+  { icon: <FaFacebookF />, label: "Facebook", href: "https://www.facebook.com/profile.php?id=61578009051256&mibextid=wwXIfr&mibextid=wwXIfr" }, // Corrigido para usar o ícone importado corretamente
+  { icon: <BsTiktok />, label: "TikTok", href: "https://www.tiktok.com/@doodle.dreams14?_t=ZM-8xq6di3BCFS&_r=1" } // Corrigido para usar o ícone importado corretamente
 ];
 
 const ContactInfo = () => {

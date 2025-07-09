@@ -27,7 +27,7 @@ const channels = [
     icon: <FaInstagram />,
     title: 'Galeria de Sonhos',
     description: 'Inspire-se e fale conosco através do nosso Instagram.',
-    href: '#', // Coloque o link do seu Instagram
+    href: 'https://www.instagram.com/doodle_dreams.colorir?igsh=eGNsbHFjeDV0azlq', // Coloque o link do seu Instagram
     bgColor: '#f3f0f9', // Roxo pastel
     iconColor: '#C13584'
   }
