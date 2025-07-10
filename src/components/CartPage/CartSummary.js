@@ -7,62 +7,83 @@ import { useCart } from '@/context/CartContext';
 import styles from './CartPage.module.css';
 import { motion } from 'framer-motion';
 import api from '@/services/api';
-import { useRouter } from 'next/navigation'; // Importar useRouter
+import { useRouter } from 'next/navigation';
+
+// Objeto de método de entrega digital padrão
+const DIGITAL_DELIVERY_METHOD = {
+  id: 'digital_delivery',
+  name: 'Entrega Digital',
+  price: '0.00',
+  company: { name: 'Doodle Dreams' },
+  delivery_time: 0,
+  custom_description: 'Seu produto será entregue por e-mail e estará disponível para download na sua conta.',
+};
 
 const CartSummary = ({ allUserAddresses, isLoadingAddresses }) => {
   const { cartItems } = useCart();
-  const router = useRouter(); // Inicializar useRouter
+  const router = useRouter();
 
   const [subtotal, setSubtotal] = useState(0);
-  // Controla a opção de seleção de endereço: 'principal', 'outro_endereco_id', 'novo_cep'
   const [selectedAddressOption, setSelectedAddressOption] = useState('principal'); 
-  const [manualCep, setManualCep] = useState(''); // CEP digitado manualmente
+  const [manualCep, setManualCep] = useState('');
   
-  const [shippingOptions, setShippingOptions] = useState([]); // Opções de frete do backend
-  const [selectedShippingMethod, setSelectedShippingMethod] = useState(null); // Método de frete selecionado
+  const [shippingOptions, setShippingOptions] = useState([]);
+  const [selectedShippingMethod, setSelectedShippingMethod] = useState(null);
   
   const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
   const [shippingError, setShippingError] = useState('');
 
-  // Calcula o subtotal dos itens no carrinho
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponError, setCouponError] = useState('');
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+
+  // NOVO: Determina se todos os itens do carrinho são digitais
+  const allCartItemsAreDigital = cartItems.every(item => item.variation.digital === true);
+
+  // Calcula o subtotal dos itens no carrinho (base, sem cupom)
   useEffect(() => {
     const total = cartItems.reduce(
       (acc, item) => acc + item.variation.price * item.quantity,
       0
     );
     setSubtotal(total);
+    setAppliedCoupon(null); 
+    setCouponCode('');
+    setCouponError('');
   }, [cartItems]);
 
-  // === NOVA LÓGICA AQUI: Forçar seleção de CEP manual se não houver endereços ===
+  // Forçar seleção de CEP manual se não houver endereços
   useEffect(() => {
-    // Se o carregamento de endereços terminou e não há endereços (array vazio ou nulo/undefined)
-    // E a opção atual não é 'novo_cep' ainda, força para 'novo_cep'.
-    if (!isLoadingAddresses && (!allUserAddresses || allUserAddresses.length === 0)) {
+    // Se não for digital e não houver endereços, força seleção de CEP manual.
+    // Se for digital, não precisamos forçar, o frete será 0.
+    if (!allCartItemsAreDigital && !isLoadingAddresses && (!allUserAddresses || allUserAddresses.length === 0)) {
       if (selectedAddressOption !== 'novo_cep') {
-        console.log("Detetado: Sem endereços ou usuário não logado. Forçando seleção de CEP manual."); // Opcional: Log para depuração
         setSelectedAddressOption('novo_cep');
-        // Limpa possíveis mensagens de erro antigas relacionadas à seleção de endereço
         setShippingError(''); 
       }
     } 
-    // Se houver endereços, a lógica padrão com a seleção dropwdown será aplicada.
-    // Não precisamos de um else para "reverter" aqui, pois o estado inicial é 'principal' 
-    // e a UI e o useEffect de cálculo já lidam com a existência de endereços.
-  }, [allUserAddresses, isLoadingAddresses, selectedAddressOption]); // Inclui selectedAddressOption nas dependências para evitar loop
+  }, [allCartItemsAreDigital, allUserAddresses, isLoadingAddresses, selectedAddressOption]);
 
   // Função para calcular o frete com base no CEP de destino
   const calculateShipping = useCallback(async (targetCep) => {
+    // Se todos os itens são digitais, não precisa chamar API de frete
+    if (allCartItemsAreDigital) {
+      setSelectedShippingMethod(DIGITAL_DELIVERY_METHOD);
+      setShippingOptions([DIGITAL_DELIVERY_METHOD]);
+      setShippingError('');
+      setIsCalculatingShipping(false);
+      return;
+    }
+
     if (!targetCep || targetCep.replace(/\D/g, '').length !== 8) {
       setShippingOptions([]);
       setSelectedShippingMethod(null);
-      // Define um erro específico para CEP inválido apenas se estiver no modo manual
       if(selectedAddressOption === 'novo_cep' && manualCep.length > 0) {
          setShippingError('Por favor, insira um CEP válido com 8 dígitos.');
       } else if (selectedAddressOption !== 'novo_cep') {
-         // Mensagem mais genérica ou limpa se não for o modo manual com input
          setShippingError('CEP de destino inválido.');
       } else {
-         // Limpa erro se o campo manual está vazio e não é válido
          setShippingError('');
       }
       return;
@@ -84,7 +105,6 @@ const CartSummary = ({ allUserAddresses, isLoadingAddresses }) => {
       });
       const validOptions = response.data.filter(opt => !opt.error);
       setShippingOptions(validOptions);
-      // Seleciona a primeira opção de frete por padrão, se houver
       if (validOptions.length > 0) {
         setSelectedShippingMethod(validOptions[0]);
       } else {
@@ -96,12 +116,20 @@ const CartSummary = ({ allUserAddresses, isLoadingAddresses }) => {
     } finally {
       setIsCalculatingShipping(false);
     }
-  }, [cartItems, selectedAddressOption, manualCep]); // Adicionado selectedAddressOption e manualCep para re-executar se mudar o modo ou o CEP manual
+  }, [allCartItemsAreDigital, cartItems, selectedAddressOption, manualCep]);
 
   // Efeito principal para gerenciar o recálculo automático do frete
-  // É disparado quando o endereço/CEP selecionado, o CEP manual, a lista de endereços ou os itens do carrinho mudam.
   useEffect(() => {
-    // Não calcula frete se ainda está carregando endereços ou carrinho está vazio
+    // Se todos os itens são digitais, define o método de entrega digital imediatamente.
+    if (allCartItemsAreDigital) {
+        setSelectedShippingMethod(DIGITAL_DELIVERY_METHOD);
+        setShippingOptions([DIGITAL_DELIVERY_METHOD]);
+        setShippingError('');
+        setIsCalculatingShipping(false);
+        return;
+    }
+
+    // Se não está carregando endereços e o carrinho está vazio, limpa tudo.
     if (isLoadingAddresses || cartItems.length === 0) {
       setShippingOptions([]);
       setSelectedShippingMethod(null);
@@ -110,11 +138,9 @@ const CartSummary = ({ allUserAddresses, isLoadingAddresses }) => {
 
     let targetCepToUse = '';
     
-    // Encontra o endereço a ser usado com base na seleção
     if (selectedAddressOption === 'novo_cep') {
       targetCepToUse = manualCep;
     } else if (selectedAddressOption === 'principal') {
-      // Tenta usar o principal. Se não existir principal, usa o primeiro da lista (se houver)
       const principalOrFirstAddress = allUserAddresses?.find(addr => addr.principal) || (allUserAddresses && allUserAddresses.length > 0 ? allUserAddresses[0] : null);
       if (principalOrFirstAddress) {
          targetCepToUse = principalOrFirstAddress.cep;
@@ -126,74 +152,107 @@ const CartSummary = ({ allUserAddresses, isLoadingAddresses }) => {
       }
     }
 
-    // Dispara o cálculo se um CEP de destino foi determinado E ele é válido
     if (targetCepToUse && targetCepToUse.replace(/\D/g, '').length === 8) {
         calculateShipping(targetCepToUse);
     } else {
-        // Limpa opções e erro se o CEP não é válido ou não foi determinado
         setShippingOptions([]);
         setSelectedShippingMethod(null);
-        // Define uma mensagem de erro apropriada se não for o modo manual com campo vazio
         if (selectedAddressOption !== 'novo_cep' || manualCep.length > 0) {
-            // Se for modo manual e tem algo digitado, o calculateShipping já colocou o erro.
-            // Se não for modo manual, ou se o campo manual está vazio, mostra este erro genérico.
              setShippingError('Selecione um endereço ou insira um CEP para calcular o frete.');
         } else {
-             // Limpa erro se o campo manual está vazio
              setShippingError('');
         }
     }
-
-    // Dependências: Recalcula se a opção de endereço, o CEP manual, a lista de endereços ou os itens do carrinho mudam.
-    // isLoadingAddresses também, pois a lógica de seleção só roda após carregar.
-  }, [selectedAddressOption, manualCep, allUserAddresses, isLoadingAddresses, cartItems, calculateShipping]);
-
+  }, [selectedAddressOption, manualCep, allUserAddresses, isLoadingAddresses, cartItems, allCartItemsAreDigital, calculateShipping]);
 
   // Lidar com a mudança na seleção do tipo de endereço/CEP (dropdown)
   const handleAddressOptionChange = (e) => {
     const value = e.target.value;
     setSelectedAddressOption(value);
-    setManualCep(''); // Limpa CEP manual ao mudar a opção
-    setSelectedShippingMethod(null); // Limpa frete selecionado
-    setShippingOptions([]); // Limpa opções
-    setShippingError(''); // Limpa erro
+    setManualCep('');
+    setSelectedShippingMethod(null);
+    setShippingOptions([]);
+    setShippingError('');
   };
 
   // Lidar com a entrada de CEP manual
   const handleManualCepChange = (e) => {
     setManualCep(e.target.value.replace(/\D/g, ''));
-    setSelectedShippingMethod(null); // Limpa frete selecionado
-    setShippingOptions([]); // Limpa opções
-    setShippingError(''); // Limpa erro
+    setSelectedShippingMethod(null);
+    setShippingOptions([]);
+    setShippingError('');
+  };
+
+  // Aplicar Cupom
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError('Por favor, digite um código de cupom.');
+      setAppliedCoupon(null);
+      return;
+    }
+
+    setIsApplyingCoupon(true);
+    setCouponError('');
+    setAppliedCoupon(null);
+
+    try {
+      const totalItemsQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+      const response = await api.post('/cupons/validar', {
+        codigo: couponCode,
+        total: subtotal,
+        quantidadeItens: totalItemsQuantity,
+      });
+
+      if (response.data.valido) {
+        setAppliedCoupon(response.data.cupom);
+      } else {
+        setCouponError(response.data.erro || 'Cupom inválido.');
+      }
+    } catch (err) {
+      console.error("Erro ao aplicar cupom:", err.response?.data?.erro || err.message);
+      setCouponError(err.response?.data?.erro || 'Não foi possível aplicar o cupom. Tente novamente.');
+    } finally {
+      setIsApplyingCoupon(false);
+    }
   };
 
   // Função para prosseguir para o checkout
   const handleProceedToCheckout = () => {
+    // Se digital, sempre pode prosseguir
+    if (allCartItemsAreDigital) {
+      localStorage.setItem('checkout_data', JSON.stringify({
+        shippingMethod: DIGITAL_DELIVERY_METHOD, // Força o método digital
+        cep: null, // Sem CEP para digital
+        coupon: appliedCoupon,
+        isDigitalOrder: true, // Adiciona flag para o checkout
+      }));
+      router.push('/checkout');
+      return;
+    }
+
+    // Para produtos físicos, exige método de frete selecionado
     if (selectedShippingMethod) {
-      // Determinar o CEP final a ser salvo com o método de frete
       let finalCep = '';
       if (selectedAddressOption === 'novo_cep') {
         finalCep = manualCep;
       } else {
-        // Encontrar o endereço selecionado (ou principal, ou o primeiro se nenhum principal)
-        // Usar optional chaining (?.) para segurança caso allUserAddresses seja null/undefined
         const selectedAddr = allUserAddresses?.find(addr => addr.id === selectedAddressOption);
         finalCep = selectedAddr ? selectedAddr.cep : (allUserAddresses?.find(addr => addr.principal) || allUserAddresses?.[0])?.cep;
       }
 
-      // Salva o método de frete e o CEP utilizado no localStorage
-      // Armazenar também o nome do método para facilitar exibição no checkout
-      localStorage.setItem('checkout_shipping_method_data', JSON.stringify({
-        method: selectedShippingMethod,
+      localStorage.setItem('checkout_data', JSON.stringify({
+        shippingMethod: selectedShippingMethod,
         cep: finalCep,
-        methodName: selectedShippingMethod.name // O nome do método, ex: "Correios SEDEX"
+        coupon: appliedCoupon,
+        isDigitalOrder: false, // Adiciona flag para o checkout
       }));
       router.push('/checkout');
     }
   };
 
+  const subtotalAfterCoupon = appliedCoupon ? appliedCoupon.novoTotalCalculado : subtotal;
   const currentShippingCost = selectedShippingMethod ? parseFloat(selectedShippingMethod.price) : 0;
-  const totalWithShipping = subtotal + currentShippingCost;
+  const totalWithShipping = subtotalAfterCoupon + currentShippingCost;
 
   return (
     <div className={styles.summaryContainer}>
@@ -204,95 +263,143 @@ const CartSummary = ({ allUserAddresses, isLoadingAddresses }) => {
         <span>R$ {subtotal.toFixed(2).replace('.', ',')}</span>
       </div>
 
+      <div className={styles.couponSection}>
+        <h3>Tem um cupom mágico?</h3>
+        {appliedCoupon ? (
+          <div className={styles.appliedCoupon}>
+            <p>Cupom Aplicado: <strong>{appliedCoupon.codigo}</strong></p>
+            <p>Desconto: -R$ {appliedCoupon.descontoCalculado.toFixed(2).replace('.', ',')}</p>
+            <button onClick={() => setAppliedCoupon(null)} className={styles.removeCouponButton}>Remover</button>
+          </div>
+        ) : (
+          <div className={styles.couponInputGroup}>
+            <input
+              type="text"
+              placeholder="Digite seu cupom"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+              className={styles.couponInput}
+              disabled={isApplyingCoupon}
+            />
+            <motion.button
+              className={styles.applyCouponButton}
+              onClick={handleApplyCoupon}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              disabled={isApplyingCoupon}
+            >
+              {isApplyingCoupon ? 'Aplicando...' : 'Aplicar'}
+            </motion.button>
+          </div>
+        )}
+        {couponError && <p className={styles.couponError}>{couponError}</p>}
+      </div>
+
+      {appliedCoupon && (
+        <div className={styles.summaryRow}>
+          <span>Desconto do Cupom</span>
+          <span>-R$ {appliedCoupon.descontoCalculado.toFixed(2).replace('.', ',')}</span>
+        </div>
+      )}
+
+      {appliedCoupon && (
+        <div className={`${styles.summaryRow} ${styles.subtotalAfterCouponRow}`}>
+          <span>Subtotal (com cupom)</span>
+          <span>R$ {subtotalAfterCoupon.toFixed(2).replace('.', ',')}</span>
+        </div>
+      )}
+
+      {/* NOVO: Seção de Frete Condicional */}
       <div className={styles.shippingSection}>
         <h3>Entrega</h3>
-        {isLoadingAddresses ? (
-            <p className={styles.loadingText}>Carregando endereços...</p>
+        {allCartItemsAreDigital ? (
+          // Exibe mensagem de entrega digital se todos os itens forem digitais
+          <div className={styles.infoText}>
+            Todos os itens são digitais. Entrega por e-mail e download na sua conta!
+            <p className={styles.shippingOptionPrice} style={{textAlign: 'center', marginTop: '1rem'}}>R$ 0,00</p>
+          </div>
         ) : (
+          // Renderiza a lógica de frete normal para produtos físicos
           <>
-            {/* Só mostra o dropdown de seleção de endereço se houver endereços cadastrados */}
-            {allUserAddresses && allUserAddresses.length > 0 ? (
-              <div className={styles.formGroup}>
-                <label htmlFor="address-option">Opções de Endereço:</label>
-                <select 
-                  id="address-option" 
-                  className={styles.selectInput}
-                  value={selectedAddressOption} 
-                  onChange={handleAddressOptionChange}
-                >
-                  {/* Opção padrão para o endereço principal (se existir) */}
-                  {allUserAddresses.some(addr => addr.principal) && (
-                    <option value="principal">Endereço Principal ({allUserAddresses.find(addr => addr.principal).cep})</option>
-                  )}
-                   {/* Primeiro endereço se não houver principal (ajuste sutil para garantir que algo esteja selecionável/visível) */}
-                  {!allUserAddresses.some(addr => addr.principal) && allUserAddresses[0] && (
-                       <option value={allUserAddresses[0].id}>
-                         {allUserAddresses[0].apelido || `${allUserAddresses[0].rua}, ${allUserAddresses[0].numero}`} ({allUserAddresses[0].cep})
-                       </option>
-                  )}
-                  {/* Outros endereços cadastrados, excluindo o principal e o primeiro se já listado */}
-                  {allUserAddresses.filter(addr => !addr.principal && addr.id !== (allUserAddresses[0]?.id || null) ).map(addr => (
-                    <option key={addr.id} value={addr.id}>
-                      {addr.apelido || `${addr.rua}, ${addr.numero}`} ({addr.cep})
-                    </option>
-                  ))}
-                  {/* Opção para inserir CEP manualmente (sempre disponível se houver endereços) */}
-                  <option value="novo_cep">Outro CEP (Manual)</option>
-                </select>
-              </div>
+            {isLoadingAddresses ? (
+                <p className={styles.loadingText}>Carregando endereços...</p>
             ) : (
-                // Mensagem quando não há endereços cadastrados
-                <p className={styles.infoText}>Você não tem endereços cadastrados. Por favor, insira um CEP para calcular o frete.</p>
-            )}
+              <>
+                {allUserAddresses && allUserAddresses.length > 0 ? (
+                  <div className={styles.formGroup}>
+                    <label htmlFor="address-option">Opções de Endereço:</label>
+                    <select 
+                      id="address-option" 
+                      className={styles.selectInput}
+                      value={selectedAddressOption} 
+                      onChange={handleAddressOptionChange}
+                    >
+                      {allUserAddresses.some(addr => addr.principal) && (
+                        <option value="principal">Endereço Principal ({allUserAddresses.find(addr => addr.principal).cep})</option>
+                      )}
+                      {!allUserAddresses.some(addr => addr.principal) && allUserAddresses[0] && (
+                          <option value={allUserAddresses[0].id}>
+                            {allUserAddresses[0].apelido || `${allUserAddresses[0].rua}, ${allUserAddresses[0].numero}`} ({allUserAddresses[0].cep})
+                          </option>
+                      )}
+                      {allUserAddresses.filter(addr => !addr.principal && addr.id !== (allUserAddresses[0]?.id || null) ).map(addr => (
+                        <option key={addr.id} value={addr.id}>
+                          {addr.apelido || `${addr.rua}, ${addr.numero}`} ({addr.cep})
+                        </option>
+                      ))}
+                      <option value="novo_cep">Outro CEP (Manual)</option>
+                    </select>
+                  </div>
+                ) : (
+                    <p className={styles.infoText}>Você não tem endereços cadastrados. Por favor, insira um CEP para calcular o frete.</p>
+                )}
 
-            {/* O campo de input de CEP manual só aparece se a opção 'novo_cep' estiver selecionada */}
-            {selectedAddressOption === 'novo_cep' && (
-              <div className={styles.formGroup}>
-                <label htmlFor="manual-cep">Digite o CEP:</label>
-                <input
-                  type="text"
-                  id="manual-cep"
-                  className={styles.textInput}
-                  placeholder="00000-000"
-                  value={manualCep}
-                  onChange={handleManualCepChange}
-                  maxLength={9} 
-                />
-              </div>
-            )}
+                {selectedAddressOption === 'novo_cep' && (
+                  <div className={styles.formGroup}>
+                    <label htmlFor="manual-cep">Digite o CEP:</label>
+                    <input
+                      type="text"
+                      id="manual-cep"
+                      className={styles.textInput}
+                      placeholder="00000-000"
+                      value={manualCep}
+                      onChange={handleManualCepChange}
+                      maxLength={9} 
+                    />
+                  </div>
+                )}
 
-            {/* Exibe a mensagem de erro, se houver */}
-            {shippingError && <p className={styles.shippingError}>{shippingError}</p>}
-            
-            {/* Área de exibição das opções de frete */}
-            {isCalculatingShipping ? (
-              <p className={styles.loadingText}>Calculando opções de frete...</p>
-            ) : (
-              shippingOptions.length > 0 ? (
-                <div className={styles.shippingOptionsList}>
-                  {shippingOptions.map(option => (
-                    <label key={option.id} className={styles.shippingOptionCard}>
-                      <input 
-                        type="radio" 
-                        name="shippingMethod" 
-                        value={option.id} 
-                        checked={selectedShippingMethod?.id === option.id}
-                        onChange={() => setSelectedShippingMethod(option)}
-                        className={styles.shippingRadio}
-                      />
-                      <div className={styles.shippingOptionDetails}>
-                        <p className={styles.shippingOptionName}>{option.name}</p>
-                        <span className={styles.shippingOptionTime}>Prazo: {option.delivery_time} dia(s) útil(eis)</span>
-                        {option.custom_description && <span className={styles.shippingOptionDesc}>{option.custom_description}</span>}
-                      </div>
-                      <span className={styles.shippingOptionPrice}>R$ {parseFloat(option.price).toFixed(2).replace('.', ',')}</span>
-                    </label>
-                  ))}
-                </div>
-              ) : (
-                 // Mostra esta mensagem apenas se não houver opções E não houver erro (o erro já explica)
-                !shippingError && <p className={styles.infoText}>Nenhuma opção de frete disponível para o CEP ou itens selecionados.</p>
-              )
+                {shippingError && <p className={styles.shippingError}>{shippingError}</p>}
+                
+                {isCalculatingShipping ? (
+                  <p className={styles.loadingText}>Calculando opções de frete...</p>
+                ) : (
+                  shippingOptions.length > 0 ? (
+                    <div className={styles.shippingOptionsList}>
+                      {shippingOptions.map(option => (
+                        <label key={option.id} className={styles.shippingOptionCard}>
+                          <input 
+                            type="radio" 
+                            name="shippingMethod" 
+                            value={option.id} 
+                            checked={selectedShippingMethod?.id === option.id}
+                            onChange={() => setSelectedShippingMethod(option)}
+                            className={styles.shippingRadio}
+                          />
+                          <div className={styles.shippingOptionDetails}>
+                            <p className={styles.shippingOptionName}>{option.name}</p>
+                            <span className={styles.shippingOptionTime}>Prazo: {option.delivery_time} dia(s) útil(eis)</span>
+                            {option.custom_description && <span className={styles.shippingOptionDesc}>{option.custom_description}</span>}
+                          </div>
+                          <span className={styles.shippingOptionPrice}>R$ {parseFloat(option.price).toFixed(2).replace('.', ',')}</span>
+                        </label>
+                      ))}
+                    </div>
+                  ) : (
+                    !shippingError && <p className={styles.infoText}>Nenhuma opção de frete disponível para o CEP ou itens selecionados.</p>
+                  )
+                )}
+              </>
             )}
           </>
         )}
@@ -308,8 +415,6 @@ const CartSummary = ({ allUserAddresses, isLoadingAddresses }) => {
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.98 }}
         onClick={handleProceedToCheckout} 
-        // Desabilita o botão se não há método de frete selecionado,
-        // se está calculando, ou se o carrinho está vazio.
         disabled={!selectedShippingMethod || isCalculatingShipping || cartItems.length === 0}
       >
         Ir para o Pagamento

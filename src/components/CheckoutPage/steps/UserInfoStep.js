@@ -8,7 +8,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/services/api';
 import { useAuth } from '@/context/AuthContext'; 
 
-const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresses, isLoadingAddresses, onLoginOrRegisterSuccess, initialCep }) => {
+// Recebe onComplete, isAuthenticated, isAuthLoading, userAddresses, isLoadingAddresses, onLoginOrRegisterSuccess, initialCep, allCartItemsAreDigital
+const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresses, isLoadingAddresses, onLoginOrRegisterSuccess, initialCep, allCartItemsAreDigital }) => {
   const { login: authLogin, user: authUser } = useAuth(); 
 
   const [showAuthForms, setShowAuthForms] = useState(false); 
@@ -142,8 +143,6 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
     setLoginError('');
     try {
       const response = await api.post('/auth/login', loginCreds);
-      // --- ALTERAÇÃO AQUI ---
-      // Passamos `null` como terceiro argumento para IMPEDIR o redirecionamento.
       authLogin(response.data.usuario, response.data.token, null);
       onLoginOrRegisterSuccess(); 
     } catch (err) {
@@ -159,8 +158,6 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
     setRegisterError('');
     try {
       const response = await api.post('/auth/register', registerCreds);
-      // --- ALTERAÇÃO AQUI ---
-      // Passamos `null` como terceiro argumento para IMPEDIR o redirecionamento.
       authLogin(response.data.usuario, response.data.token, null);
       onLoginOrRegisterSuccess(); 
     } catch (err) {
@@ -177,6 +174,21 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
     let finalAddressData = null;
     let userContactData = null; 
 
+    // NOVO: Se o pedido é 100% digital, o endereço pode ser nulo/simples
+    if (allCartItemsAreDigital) {
+      // Se não está logado, precisa pelo menos do nome e email para o pedido
+      if (!isAuthenticated && (!registerCreds.nome || !registerCreds.email)) {
+        setAddressFormError('Por favor, informe seu nome e email para contato.');
+        return;
+      }
+      // Para pedidos digitais, o endereço é opcional e pode ser um objeto vazio/simples
+      finalAddressData = {}; // Ou { cep: '00000000' } se o backend exigir CEP mesmo para digital
+      userContactData = isAuthenticated ? { nome: authUser?.nome, email: authUser?.email } : { nome: registerCreds.nome, email: registerCreds.email };
+      onComplete({ ...userContactData, ...finalAddressData });
+      return;
+    }
+
+    // Lógica existente para pedidos FÍSICOS
     if (isAuthenticated) {
         const selectedId = e.target.elements['address-selection']?.value; 
 
@@ -230,7 +242,7 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
         };
 
 
-    } else {
+    } else { // Não autenticado, deve preencher nome/email e endereço
         if (!registerCreds.nome || !registerCreds.email || !addressFormData.rua || !addressFormData.numero || !addressFormData.bairro || !addressFormData.cidade || !addressFormData.estado || !addressFormData.cep) {
              setAddressFormError('Por favor, preencha todos os dados de contato e endereço.');
              return;
@@ -352,80 +364,85 @@ const UserInfoStep = ({ onComplete, isAuthenticated, isAuthLoading, userAddresse
               </p>
          )}
 
-        {isLoadingAddresses ? (
-          <p className={styles.loadingText}>Carregando endereços cadastrados...</p>
-        ) : isAuthenticated && userAddresses.length > 0 ? ( 
-          <motion.div key="selectAddress" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <div className={styles.formGroup}>
-              <label htmlFor="address-selection">Selecione um Endereço:</label>
-              <select 
-                id="address-selection" 
-                name="address-selection" 
-                className={styles.selectInput}
-                value={selectedExistingAddressId} 
-                onChange={handleAddressSelectionChange}
-              >
-                {userAddresses.map(addr => (
-                  <option key={addr.id} value={addr.id}>
-                    {addr.apelido || `${addr.rua}, ${addr.numero}`} ({addr.cep}) {addr.principal ? ' (Principal)' : ''}
-                  </option>
-                ))}
-                <option value="new_address">Adicionar Novo Endereço</option>
-              </select>
-            </div>
-          </motion.div>
-        ) : null }
-        
-        {(!isAuthenticated || selectedExistingAddressId === 'new_address' || userAddresses.length === 0) && (
-             <motion.div 
-                initial={{ opacity: 0 }} 
-                animate={{ opacity: 1 }} 
-                key="manualAddressForm" 
-             >
-                <h4 className={styles.subheading}>Detalhes do {isAuthenticated && (userAddresses.length > 0 ? 'Novo ' : '')} Endereço</h4>
-                 <div className={styles.formGroup}>
-                    <label htmlFor="address-apelido">Apelido (ex: Casa, Trabalho)</label>
-                    <input type="text" id="address-apelido" name="apelido" value={addressFormData.apelido} onChange={handleAddressFormChange} />
-                  </div>
-                <div className={styles.formGrid}>
-                    <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                      <label htmlFor="endereco-cep">CEP</label>
-                      <input type="text" id="endereco-cep" name="cep" value={addressFormData.cep} onChange={handleCepChange} maxLength={9} placeholder="00000-000" required />
-                      {isSearchingCep && <p className={styles.cepStatus}>Buscando...</p>}
-                      {cepError && <p className={styles.cepError}>{cepError}</p>}
-                    </div>
-                    <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                      <label htmlFor="endereco-rua">Rua / Logradouro</label>
-                      <input type="text" id="endereco-rua" name="rua" value={addressFormData.rua} onChange={handleAddressFormChange} required />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label htmlFor="endereco-numero">Número</label>
-                      <input type="text" id="endereco-numero" name="numero" value={addressFormData.numero} onChange={handleAddressFormChange} required />
-                    </div>
-                     <div className={styles.formGroup}>
-                      <label htmlFor="endereco-complemento">Complemento (Opcional)</label>
-                      <input type="text" id="endereco-complemento" name="complemento" value={addressFormData.complemento} onChange={handleAddressFormChange} />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label htmlFor="endereco-bairro">Bairro</label>
-                      <input type="text" id="endereco-bairro" name="bairro" value={addressFormData.bairro} onChange={handleAddressFormChange} required />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label htmlFor="endereco-cidade">Cidade</label>
-                      <input type="text" id="endereco-cidade" name="cidade" value={addressFormData.cidade} onChange={handleAddressFormChange} required />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label htmlFor="endereco-estado">Estado (UF)</label>
-                      <input type="text" id="endereco-estado" name="estado" value={addressFormData.estado} onChange={handleAddressFormChange} maxLength={2} required />
-                    </div>
-                     {isAuthenticated && selectedExistingAddressId === 'new_address' && (
-                         <div className={`${styles.checkboxGroup} ${styles.fullWidth}`}>
-                             <input type="checkbox" id="principal-checkbox" name="principal" />
-                             <label htmlFor="principal-checkbox">Tornar este o endereço principal</label>
-                         </div>
-                     )}
+        {/* NOVO: Esconde a seleção/form de endereço se o pedido for 100% digital */}
+        {!allCartItemsAreDigital && (
+          <>
+            {isLoadingAddresses ? (
+              <p className={styles.loadingText}>Carregando endereços cadastrados...</p>
+            ) : isAuthenticated && userAddresses.length > 0 ? ( 
+              <motion.div key="selectAddress" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <div className={styles.formGroup}>
+                  <label htmlFor="address-selection">Selecione um Endereço:</label>
+                  <select 
+                    id="address-selection" 
+                    name="address-selection" 
+                    className={styles.selectInput}
+                    value={selectedExistingAddressId} 
+                    onChange={handleAddressSelectionChange}
+                  >
+                    {userAddresses.map(addr => (
+                      <option key={addr.id} value={addr.id}>
+                        {addr.apelido || `${addr.rua}, ${addr.numero}`} ({addr.cep}) {addr.principal ? ' (Principal)' : ''}
+                      </option>
+                    ))}
+                    <option value="new_address">Adicionar Novo Endereço</option>
+                  </select>
                 </div>
-             </motion.div>
+              </motion.div>
+            ) : null }
+            
+            {(selectedExistingAddressId === 'new_address' || userAddresses.length === 0) && (
+                <motion.div 
+                    initial={{ opacity: 0 }} 
+                    animate={{ opacity: 1 }} 
+                    key="manualAddressForm" 
+                >
+                    <h4 className={styles.subheading}>Detalhes do {isAuthenticated && (userAddresses.length > 0 ? 'Novo ' : '')} Endereço</h4>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="address-apelido">Apelido (ex: Casa, Trabalho)</label>
+                        <input type="text" id="address-apelido" name="apelido" value={addressFormData.apelido} onChange={handleAddressFormChange} />
+                    </div>
+                    <div className={styles.formGrid}>
+                        <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                        <label htmlFor="endereco-cep">CEP</label>
+                        <input type="text" id="endereco-cep" name="cep" value={addressFormData.cep} onChange={handleCepChange} maxLength={9} placeholder="00000-000" required />
+                        {isSearchingCep && <p className={styles.cepStatus}>Buscando...</p>}
+                        {cepError && <p className={styles.cepError}>{cepError}</p>}
+                        </div>
+                        <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                        <label htmlFor="endereco-rua">Rua / Logradouro</label>
+                        <input type="text" id="endereco-rua" name="rua" value={addressFormData.rua} onChange={handleAddressFormChange} required />
+                        </div>
+                        <div className={styles.formGroup}>
+                        <label htmlFor="endereco-numero">Número</label>
+                        <input type="text" id="endereco-numero" name="numero" value={addressFormData.numero} onChange={handleAddressFormChange} required />
+                        </div>
+                        <div className={styles.formGroup}>
+                        <label htmlFor="endereco-complemento">Complemento (Opcional)</label>
+                        <input type="text" id="endereco-complemento" name="complemento" value={addressFormData.complemento} onChange={handleAddressFormChange} />
+                        </div>
+                        <div className={styles.formGroup}>
+                        <label htmlFor="endereco-bairro">Bairro</label>
+                        <input type="text" id="endereco-bairro" name="bairro" value={addressFormData.bairro} onChange={handleAddressFormChange} required />
+                        </div>
+                        <div className={styles.formGroup}>
+                        <label htmlFor="endereco-cidade">Cidade</label>
+                        <input type="text" id="endereco-cidade" name="cidade" value={addressFormData.cidade} onChange={handleAddressFormChange} required />
+                        </div>
+                        <div className={styles.formGroup}>
+                        <label htmlFor="endereco-estado">Estado (UF)</label>
+                        <input type="text" id="endereco-estado" name="estado" value={addressFormData.estado} onChange={handleAddressFormChange} maxLength={2} required />
+                        </div>
+                        {isAuthenticated && selectedExistingAddressId === 'new_address' && (
+                            <div className={`${styles.checkboxGroup} ${styles.fullWidth}`}>
+                                <input type="checkbox" id="principal-checkbox" name="principal" />
+                                <label htmlFor="principal-checkbox">Tornar este o endereço principal</label>
+                            </div>
+                        )}
+                    </div>
+                </motion.div>
+            )}
+          </>
         )}
 
         {addressFormError && <p className={styles.errorMessage}>{addressFormError}</p>}

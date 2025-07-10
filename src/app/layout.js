@@ -6,9 +6,10 @@ import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
-import { FilterProvider } from '@/context/FilterContext'; // <-- 1. Importar o novo provider
+import { FilterProvider } from '@/context/FilterContext';
+import CouponPopup from '@/components/CouponPopup/CouponPopup'; // <-- NOVO: Importar o componente do pop-up
 
-// Configuração das fontes (sem alteração)
+// Configuração das fontes
 const mali = Mali({
   subsets: ['latin'],
   weight: ['200', '300', '400', '500', '600', '700'],
@@ -39,11 +40,11 @@ export default function RootLayout({ children }) {
       <body>
         <AuthProvider>
           <CartProvider>
-            {/* 2. Envolver com o FilterProvider */}
             <FilterProvider>
               <Header />
               <main>{children}</main>
               <Footer />
+              <CouponPopup /> {/* <-- NOVO: Adicionar o componente do pop-up aqui */}
             </FilterProvider>
           </CartProvider>
         </AuthProvider>

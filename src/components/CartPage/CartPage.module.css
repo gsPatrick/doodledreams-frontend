@@ -597,3 +597,128 @@
   padding: 0.25rem;
   line-height: 1;
 }
+
+/* --- NOVOS ESTILOS: Seção de Cupom --- */
+.couponSection {
+  margin: 2rem 0;
+  border-top: 1px solid var(--doodle-input-border);
+  padding-top: 1.5rem;
+}
+.couponSection h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--doodle-dark-grey);
+  margin-bottom: 0.8rem;
+}
+
+.couponInputGroup {
+  display: flex;
+  gap: 0.5rem;
+}
+.couponInput {
+  flex-grow: 1;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--doodle-input-border);
+  font-size: 1rem;
+  text-transform: uppercase; /* Força o input para maiúsculas */
+}
+.couponInput:focus {
+  outline: none;
+  border-color: var(--doodle-purple-soft);
+  box-shadow: 0 0 0 2px rgba(144, 122, 204, 0.2);
+}
+.applyCouponButton {
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--doodle-blue-soft);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.applyCouponButton:hover {
+  background-color: var(--doodle-blue-dark);
+}
+.applyCouponButton:disabled {
+  background-color: var(--doodle-placeholder-text);
+  cursor: not-allowed;
+}
+
+.couponError {
+  color: var(--doodle-pink-pastel);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.appliedCoupon {
+  background-color: #e0f8e4; /* Verde pastel para indicar sucesso */
+  border: 1px solid #c8e6c9;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 0.9rem;
+  color: #1e6a25; /* Texto verde escuro */
+  position: relative;
+}
+.appliedCoupon p {
+  margin: 0;
+  line-height: 1.5;
+}
+.appliedCoupon strong {
+  font-family: var(--font-mali-next);
+  font-weight: 700;
+  color: #0d4a13;
+}
+.removeCouponButton {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: none;
+  border: none;
+  color: #d9466b; /* Rosa para o botão de remover */
+  font-size: 0.8rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.removeCouponButton:hover {
+  color: #b3395b;
+}
+
+/* Linha de Subtotal após cupom */
+.subtotalAfterCouponRow {
+    padding-top: 0.5rem; /* Menor que a totalRow */
+    margin-top: 0.5rem;
+    border-top: 1px dashed var(--doodle-input-border);
+    font-size: 1.2rem;
+}
+.subtotalAfterCouponRow span:first-child {
+    color: var(--doodle-dark-grey);
+    font-weight: 600;
+}
+.subtotalAfterCouponRow span:last-child {
+    color: var(--doodle-green-pastel);
+    font-weight: 700;
+}
+/* --- FIM NOVOS ESTILOS: Seção de Cupom --- */
+
+/* Estilos para a mensagem de entrega digital (NOVO) */
+.infoText strong {
+    font-family: var(--font-mali-next);
+    font-weight: 700;
+    color: var(--doodle-dark-grey);
+}
+
+/* Reafirmando o padding para o .infoText padrão no CartSummary */
+.infoText {
+  font-size: 0.95rem;
+  color: var(--doodle-placeholder-text);
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background-color: var(--doodle-beige-light);
+  border-radius: 8px;
+  border: 1px solid var(--doodle-input-border);
+}

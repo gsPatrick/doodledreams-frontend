@@ -7,15 +7,43 @@ import styles from '../CheckoutPage.module.css';
 import { BsBoxSeam } from 'react-icons/bs';
 import api from '@/services/api'; 
 
-// Recebe userAddress (OBJETO completo), initialShippingMethod (OBJETO método), cartItems (ARRAY)
-const ShippingStep = ({ onComplete, onPrev, userAddress, initialShippingMethod, cartItems }) => {
+// Objeto de método de entrega digital padrão (duplicado aqui para clareza, pode ser importado de um util)
+const DIGITAL_DELIVERY_METHOD = {
+  id: 'digital_delivery',
+  name: 'Entrega Digital',
+  price: '0.00',
+  company: { name: 'Doodle Dreams' },
+  delivery_time: 0,
+  custom_description: 'Seu produto será entregue por e-mail e estará disponível para download na sua conta.',
+};
+
+// Recebe userAddress, initialShippingMethod, cartItems, allCartItemsAreDigital
+const ShippingStep = ({ onComplete, onPrev, userAddress, initialShippingMethod, cartItems, allCartItemsAreDigital }) => {
   const [shippingOptions, setShippingOptions] = useState([]);
-  const [selectedOption, setSelectedOption] = useState(null); // SelectedOption é o OBJETO do método
+  const [selectedOption, setSelectedOption] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [shippingError, setShippingError] = useState('');
 
+  // Efeito para lidar com pedidos 100% digitais: "auto-completa" o passo de frete
+  useEffect(() => {
+    if (allCartItemsAreDigital) {
+      setSelectedOption(DIGITAL_DELIVERY_METHOD); // Seleciona o método digital
+      setShippingOptions([DIGITAL_DELIVERY_METHOD]); // Mostra apenas essa opção
+      // Chama onComplete para ir para o próximo passo.
+      // Pequeno delay para evitar que o estado seja atualizado muito rápido antes da renderização.
+      const timer = setTimeout(() => {
+        onComplete(DIGITAL_DELIVERY_METHOD);
+      }, 100); 
+      return () => clearTimeout(timer);
+    }
+  }, [allCartItemsAreDigital, onComplete]);
+
+
   // Calcular frete usando o endereço COMPLETO fornecido e os itens do carrinho
   const calculateShipping = useCallback(async (address) => {
+    // Se todos os itens são digitais, este callback não deve ser chamado
+    if (allCartItemsAreDigital) return; // Garante que não executa para digitais
+
     if (!address || !address.cep || address.cep.replace(/\D/g, '').length !== 8) {
       setShippingOptions([]);
       setSelectedOption(null);
@@ -40,20 +68,16 @@ const ShippingStep = ({ onComplete, onPrev, userAddress, initialShippingMethod, 
       const validOptions = response.data.filter(opt => !opt.error);
       setShippingOptions(validOptions);
 
-      // --- Lógica de Pré-seleção ---
       let preSelected = null;
       if (initialShippingMethod) {
-        // Tenta encontrar o método inicial entre as opções válidas retornadas
         preSelected = validOptions.find(opt => opt.id === initialShippingMethod.id);
       }
 
-      // Se o método inicial foi encontrado OU se não havia método inicial, mas há opções, seleciona o primeiro válido
       if (preSelected) {
          setSelectedOption(preSelected);
       } else if (validOptions.length > 0) {
         setSelectedOption(validOptions[0]);
       } else {
-        // Nenhuma opção válida encontrada
         setShippingError('Nenhuma opção de frete disponível para o endereço informado.');
       }
 
@@ -63,37 +87,50 @@ const ShippingStep = ({ onComplete, onPrev, userAddress, initialShippingMethod, 
     } finally {
       setIsLoading(false);
     }
-  }, [userAddress, cartItems, initialShippingMethod]); // Depende do endereço e itens do carrinho
+  }, [userAddress, cartItems, initialShippingMethod, allCartItemsAreDigital]);
 
   // Efeito para disparar o cálculo de frete quando o endereço do usuário ou itens mudam
   useEffect(() => {
-    // Dispara o cálculo apenas se o userAddress está disponível e os itens existem
-    if (userAddress && cartItems.length > 0) {
-       // O calculateShipping já lida com o initialShippingMethod dentro dele
+    // Dispara o cálculo apenas se o userAddress está disponível, itens existem E NÃO É UM PEDIDO DIGITAL
+    if (userAddress && cartItems.length > 0 && !allCartItemsAreDigital) {
        calculateShipping(userAddress);
-    } else if (!userAddress) {
-       // Se o userAddress não está disponível (algo deu errado no passo 1)
+    } else if (!userAddress && !allCartItemsAreDigital) { // Se não é digital, mas não tem endereço
        setShippingError('Por favor, retorne ao passo anterior para informar o endereço.');
        setShippingOptions([]);
        setSelectedOption(null);
     }
-
-  }, [userAddress, cartItems, calculateShipping]); // Depende do userAddress e cartItems
+    // Se for allCartItemsAreDigital, o useEffect acima já cuidou disso.
+  }, [userAddress, cartItems, allCartItemsAreDigital, calculateShipping]);
 
 
   const handleSelectOption = (option) => {
     setSelectedOption(option);
   };
 
-  // Renderização
+  // Se o pedido é digital, não mostra os campos de frete, apenas uma mensagem
+  if (allCartItemsAreDigital) {
+    return (
+        <div className={styles.infoText}>
+           Todos os itens do seu pedido são digitais! Não há custo de frete.
+           <p className={styles.shippingOptionPrice} style={{textAlign: 'center', marginTop: '1rem'}}>R$ 0,00</p>
+            {/* Os botões de ação são desabilitados porque o onComplete já será chamado */}
+           <div className={styles.stepActions}>
+               <button type="button" onClick={onPrev} className={styles.prevButton}>Voltar</button>
+               <button type="button" className={styles.nextButton} disabled>
+                 Prosseguir Automaticamente...
+               </button>
+           </div>
+        </div>
+    );
+  }
+
+  // Renderização normal para produtos físicos
   if (!userAddress) {
-      // Se o endereço não veio do passo 1, não renderiza as opções de frete
       return (
           <div className={styles.infoText}>
              Aguardando informações de endereço do passo anterior...
               <div className={styles.stepActions}>
                 <button type="button" onClick={onPrev} className={styles.prevButton}>Voltar</button>
-                {/* Botão próximo desabilitado pois não tem endereço */}
                 <button type="button" className={styles.nextButton} disabled={true}>
                   Ir para Pagamento
                 </button>
@@ -105,7 +142,6 @@ const ShippingStep = ({ onComplete, onPrev, userAddress, initialShippingMethod, 
 
   return (
     <div>
-      {/* Não mostra o formulário de CEP manual aqui, usa apenas o endereço do passo 1 */}
        <div className={styles.infoText}>
          Calculando frete para: <strong>{userAddress.cep}</strong> ({userAddress.rua}, {userAddress.numero})
        </div>
@@ -141,7 +177,6 @@ const ShippingStep = ({ onComplete, onPrev, userAddress, initialShippingMethod, 
       
       <div className={styles.stepActions}>
         <button type="button" onClick={onPrev} className={styles.prevButton}>Voltar</button>
-        {/* Chamar onComplete com a opção selecionada */}
         <button type="button" onClick={() => onComplete(selectedOption)} className={styles.nextButton} disabled={!selectedOption}>
           Ir para Pagamento
         </button>

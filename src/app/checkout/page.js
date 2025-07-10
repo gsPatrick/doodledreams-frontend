@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 import CheckoutSteps from '@/components/CheckoutPage/CheckoutSteps';
-import OrderSummary from '@/components/CheckoutPage/OrderSummary'; // Importe o OrderSummary do checkout
+import OrderSummary from '@/components/CheckoutPage/OrderSummary';
 import StepIndicator from '@/components/CheckoutPage/StepIndicator';
 
 export default function CheckoutPage() {
@@ -19,15 +19,17 @@ export default function CheckoutPage() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
 
-  // Estado para armazenar os dados iniciais vindo do carrinho
   const [initialCheckoutData, setInitialCheckoutData] = useState(null);
   const [hasLoadedInitialData, setHasLoadedInitialData] = useState(false);
 
-  // Estados para dados que transitam entre os passos
-  const [finalUserData, setFinalUserData] = useState(null); // Dados do Passo 1 (usuário + endereço)
-  const [finalShippingMethod, setFinalShippingMethod] = useState(null); // Dados do Passo 2 (frete selecionado)
+  const [finalUserData, setFinalUserData] = useState(null);
+  const [finalShippingMethod, setFinalShippingMethod] = useState(null);
+  const [finalAppliedCoupon, setFinalAppliedCoupon] = useState(null);
 
-  // Redireciona para o carrinho se estiver vazio ou se não houver dados iniciais de frete
+  // NOVO: Determina se todos os itens do carrinho são digitais
+  const allCartItemsAreDigital = cartItems.every(item => item.variation.digital === true);
+
+  // Redireciona para o carrinho se estiver vazio ou se não houver dados iniciais
   useEffect(() => {
     if (cartItems.length === 0) {
       router.push('/cart');
@@ -35,26 +37,24 @@ export default function CheckoutPage() {
     }
     
     if (typeof window !== 'undefined' && !hasLoadedInitialData) {
-       const storedData = localStorage.getItem('checkout_initial_data');
+       const storedData = localStorage.getItem('checkout_data');
        if (storedData) {
          try {
             const parsedData = JSON.parse(storedData);
             setInitialCheckoutData(parsedData);
-            localStorage.removeItem('checkout_initial_data'); // Limpar após carregar
+            setFinalShippingMethod(parsedData.shippingMethod);
+            setFinalAppliedCoupon(parsedData.coupon);
+            localStorage.removeItem('checkout_data');
          } catch(error) {
             console.error("Erro ao parsear dados iniciais do checkout:", error);
-            // Se der erro, limpa e força a começar do zero (sem frete pré-selecionado)
-            localStorage.removeItem('checkout_initial_data');
+            localStorage.removeItem('checkout_data');
             setInitialCheckoutData(null);
          }
        }
-       setHasLoadedInitialData(true); // Marca como carregado
+       setHasLoadedInitialData(true);
     }
 
-     // Se já carregou os dados iniciais E ELES NÃO EXISTEM, redireciona de volta
-     // Isso impede que a pessoa acesse /checkout diretamente sem passar pelo carrinho
     if (hasLoadedInitialData && !initialCheckoutData && cartItems.length > 0) {
-        // Comentado para permitir testar a página de checkout diretamente se necessário
         // router.push('/cart'); 
     }
 
@@ -67,7 +67,6 @@ export default function CheckoutPage() {
     { label: 'Finalizar Compra', href: null },
   ];
 
-  // Não renderiza nada se o carrinho estiver vazio
   if (cartItems.length === 0) {
     return null; 
   }
@@ -80,8 +79,7 @@ export default function CheckoutPage() {
         <p>Falta pouco para a magia chegar até você!</p>
       </div>
 
-      {/* Passamos o frete final para o StepIndicator */}
-      <StepIndicator currentStep={currentStep} finalShippingMethod={finalShippingMethod} />
+      <StepIndicator currentStep={currentStep} />
       
       <div className={styles.checkoutLayout}>
         <div className={styles.stepsColumn}>
@@ -90,16 +88,19 @@ export default function CheckoutPage() {
             setCurrentStep={setCurrentStep} 
             isAuthenticated={isAuthenticated} 
             isAuthLoading={isAuthLoading} 
-            initialCheckoutData={initialCheckoutData} // Passa os dados iniciais (frete + cep)
-            onUserDataComplete={(data) => setFinalUserData(data)} // Callback para setar dados do passo 1
-            onShippingComplete={(method) => setFinalShippingMethod(method)} // Callback para setar frete do passo 2
+            initialCheckoutData={initialCheckoutData}
+            onUserDataComplete={(data) => setFinalUserData(data)}
+            onShippingComplete={(method) => setFinalShippingMethod(method)}
+            finalAppliedCoupon={finalAppliedCoupon}
+            allCartItemsAreDigital={allCartItemsAreDigital} // NOVO: Passar flag digital
           />
         </div>
         <div className={styles.summaryColumn}>
-          {/* Passamos o frete final para o OrderSummary do checkout */}
           <OrderSummary 
-             cartItems={cartItems} // Passar itens do carrinho também
+             cartItems={cartItems}
              selectedShippingMethod={finalShippingMethod} 
+             appliedCoupon={finalAppliedCoupon}
+             allCartItemsAreDigital={allCartItemsAreDigital} // NOVO: Passar flag digital
           />
         </div>
       </div>
