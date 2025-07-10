@@ -10,13 +10,13 @@ import { useFilter } from '@/context/FilterContext'; // Importa o hook do contex
 
 import styles from './CollectionsSection.module.css';
 
-// Dados das coleções com IDs ajustados para corresponder ao que o filtro espera
+// Dados das coleções com IDs AGORA AJUSTADOS para corresponder aos IDs do seu backend
 const collectionData = [
   { id: '1', name: 'Infantil', description: '3 a 8 anos', iconPath: '/imagens/lapisduplo.svg', bgColorVar: 'var(--doodle-yellow-light)', linkTextColorVar: 'var(--doodle-blue-soft)', },
   { id: '2', name: 'Juvenil', description: '9 a 14 anos', iconPath: '/imagens/arcoiris.svg', bgColorVar: 'var(--doodle-green-pastel)', linkTextColorVar: 'var(--doodle-purple-soft)', },
   { id: '3', name: 'Adulto', description: 'Temas terapêuticos e artísticos', iconPath: '/imagens/sol.svg', bgColorVar: 'var(--doodle-pink-pastel)', linkTextColorVar: 'var(--doodle-blue-soft)', },
-  { id: '4', name: 'Temáticos', description: 'Aventuras e histórias especiais', iconPath: '/imagens/star.svg', bgColorVar: 'var(--doodle-blue-sky)', linkTextColorVar: 'var(--doodle-yellow-mustard)', },
-  { id: '5', name: 'Artigos Diversos', description: 'Materiais de arte e acessórios', iconPath: '/imagens/estrela2.svg', bgColorVar: 'var(--doodle-purple-light)', linkTextColorVar: 'var(--doodle-green-pastel)', },
+  { id: '5', name: 'Temáticos', description: 'Aventuras e histórias especiais', iconPath: '/imagens/star.svg', bgColorVar: 'var(--doodle-blue-sky)', linkTextColorVar: 'var(--doodle-yellow-mustard)', }, // ID corrigido para '5'
+  { id: '4', name: 'Artigos Diversos', description: 'Materiais de arte e acessórios', iconPath: '/imagens/estrela2.svg', bgColorVar: 'var(--doodle-purple-light)', linkTextColorVar: 'var(--doodle-green-pastel)', }, // ID corrigido para '4'
 ];
 
 // Variantes de animação do Framer Motion
