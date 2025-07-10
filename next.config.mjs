@@ -3,6 +3,13 @@ const nextConfig = {
   reactStrictMode: true, // Pode manter, sem problemas.
   images: {
     remotePatterns: [
+
+      {
+        protocol: 'https',
+        hostname: 'n8n-doodledreamsmidia.r954jc.easypanel.host', // SEU DOMÍNIO DO SERVIDOR DE MÍDIAS
+        port: '',
+        pathname: '/**', // Permite qualquer caminho dentro desse domínio
+      },
       // Configuração para placehold.co (está correta)
       {
         protocol: 'https',
