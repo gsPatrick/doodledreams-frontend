@@ -2,21 +2,20 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react'; // Importar useState e useEffect
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import styles from './ProductCard.module.css';
-// 1. Importar os ícones de coração (vazio e preenchido)
 import { BsHeart, BsHeartFill } from 'react-icons/bs';
-import api from '@/services/api'; // Para interagir com a API de favoritos
-import { useAuth } from '@/context/AuthContext'; // Para verificar se o usuário está logado
+import api from '@/services/api';
+import { useAuth } from '@/context/AuthContext';
 
 const ProductCard = ({ product, index }) => {
-  const [isFavorite, setIsFavorite] = useState(false); // Estado para controlar se é favorito
-  const [isLoadingFavorite, setIsLoadingFavorite] = useState(true); // Estado de carregamento do favorito
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isLoadingFavorite, setIsLoadingFavorite] = useState(true);
 
-  const { isAuthenticated } = useAuth(); // Obtém o status de autenticação
+  const { isAuthenticated } = useAuth();
 
   const cardVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -32,9 +31,7 @@ const ProductCard = ({ product, index }) => {
     }
   };
 
-  // 2. Efeito para verificar o status de favorito ao carregar o componente
   useEffect(() => {
-    // Só verifica se o usuário está autenticado e o produto tem um ID
     if (isAuthenticated && product.id) {
       setIsLoadingFavorite(true);
       api.get(`/favoritos/verificar/${product.id}`)
@@ -43,22 +40,20 @@ const ProductCard = ({ product, index }) => {
         })
         .catch(error => {
           console.error("Erro ao verificar favorito:", error);
-          setIsFavorite(false); // Assume que não é favorito em caso de erro
+          setIsFavorite(false);
         })
         .finally(() => {
           setIsLoadingFavorite(false);
         });
     } else {
-      setIsFavorite(false); // Se não está autenticado, não pode ser favorito
+      setIsFavorite(false);
       setIsLoadingFavorite(false);
     }
-  }, [isAuthenticated, product.id]); // Re-executa se a autenticação ou o ID do produto mudar
+  }, [isAuthenticated, product.id]);
 
-
-  // 3. Função para adicionar/remover dos favoritos
   const handleToggleFavorite = async (e) => {
-    e.preventDefault(); // Previne a navegação para a página do produto
-    e.stopPropagation(); // Previne que o clique no botão ative o Link pai
+    e.preventDefault();
+    e.stopPropagation();
     
     if (!isAuthenticated) {
       alert("Você precisa estar logado para adicionar produtos aos favoritos.");
@@ -82,12 +77,8 @@ const ProductCard = ({ product, index }) => {
     }
   };
 
-  // 4. Lógica de dados robusta para imagem e preço (já estava boa, só mantendo)
   const imageSrc = product.imageSrc || product.imagens?.[0] || 'https://placehold.co/400x400.png';
-  const firstVariation = product.variacoes?.[0];
-  const priceAsNumber = Number(firstVariation?.preco) || Number(product.price) || 0;
-  const formattedPrice = priceAsNumber.toFixed(2).replace('.', ',');
-
+  // Removido o cálculo de preço aqui, pois ele não será exibido.
 
   return (
     <motion.div
@@ -97,7 +88,6 @@ const ProductCard = ({ product, index }) => {
       viewport={{ once: true }}
       className={styles.productCard}
     >
-      {/* O Link agora envolve apenas a imagem e o nome/preço, para que os botões tenham cliques independentes */}
       <Link href={`/product/${product.slug || product.id}`} className={styles.productLink}>
         {product.isNew && <span className={styles.newBadge}>Novo!</span>}
         
@@ -113,34 +103,34 @@ const ProductCard = ({ product, index }) => {
 
         <div className={styles.productInfo}>
             <h3 className={styles.productName}>{product.name || 'Nome Indisponível'}</h3>
-            {/* 5. Preço REMOVIDO daqui */}
         </div>
       </Link>
 
-      {/* 6. Nova seção para as ações (botões) */}
       <div className={styles.cardActions}>
-          {/* Botão "Ver Detalhes" */}
           <Link href={`/product/${product.slug || product.id}`} className={styles.viewDetailsButton}>
               Ver Detalhes
           </Link>
 
-          {/* Botão "Adicionar/Remover dos Favoritos" */}
           <motion.button 
             className={`${styles.addToFavoritesButton} ${isFavorite ? styles.isFavorite : ''}`}
             onClick={handleToggleFavorite}
-            disabled={isLoadingFavorite} // Desabilita enquanto verifica/atualiza
+            disabled={isLoadingFavorite}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            {/* Ícone muda com base no estado `isFavorite` */}
             {isLoadingFavorite ? (
-              '...' // Ou um spinner
+              <>
+                {isFavorite ? <BsHeartFill /> : <BsHeart />} Carregando...
+              </>
             ) : isFavorite ? (
-              <BsHeartFill />
+              <>
+                <BsHeartFill /> Remover dos Favoritos
+              </>
             ) : (
-              <BsHeart />
+              <>
+                <BsHeart /> Adicionar aos Favoritos
+              </>
             )}
-            {/* Texto opcional: {isFavorite ? 'Favorito' : 'Favoritar'} */}
           </motion.button>
       </div>
     </motion.div>
