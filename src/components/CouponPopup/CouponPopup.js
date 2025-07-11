@@ -20,21 +20,14 @@ const CouponPopup = () => {
 
   const popupRef = useRef(null); // Ref para detectar cliques fora do modal
 
-  // 1. Lógica para verificar e buscar o cupom principal
+  // 1. Lógica para buscar o cupom principal
   useEffect(() => {
-    const checkIfPopupNeedsToShow = async () => {
+    const fetchCoupon = async () => {
       // Verifica se estamos no lado do cliente
       if (typeof window === 'undefined') return;
 
-      // Controle de frequência: mostra apenas a cada 24 horas (ou 0.5h para teste)
-      const lastShown = localStorage.getItem('doodle_coupon_popup_last_shown');
-      const COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24 horas em milissegundos
-      // const COOLDOWN_MS = 0.5 * 60 * 60 * 1000; // PARA TESTE: 30 minutos
-
-      if (lastShown && (Date.now() - parseInt(lastShown, 10)) < COOLDOWN_MS) {
-        setIsLoading(false); // Já foi exibido recentemente, não precisa buscar
-        return;
-      }
+      // REMOVIDO: Controle de frequência que usava localStorage.
+      // Agora, a verificação sempre prosseguirá para buscar o cupom.
 
       // Tenta buscar o cupom principal do backend
       try {
@@ -42,7 +35,7 @@ const CouponPopup = () => {
         if (response.data.cupomPrincipal) {
           setCoupon(response.data.cupomPrincipal);
           setIsOpen(true); // Abre o pop-up
-          localStorage.setItem('doodle_coupon_popup_last_shown', Date.now().toString()); // Marca como exibido
+          // REMOVIDO: A linha que marcava o pop-up como exibido no localStorage.
         }
       } catch (err) {
         console.error("Erro ao buscar cupom principal:", err);
@@ -54,7 +47,7 @@ const CouponPopup = () => {
 
     // Pequeno atraso para o pop-up não aparecer instantaneamente na entrada
     const timer = setTimeout(() => {
-      checkIfPopupNeedsToShow();
+      fetchCoupon();
     }, 1500); // 1.5 segundos de atraso
 
     return () => clearTimeout(timer); // Limpa o timer se o componente desmontar
@@ -113,7 +106,7 @@ const CouponPopup = () => {
   }
 
   // Formatar o valor do cupom para exibição
-  const formattedValue = coupon.tipo === 'percentual' 
+  const formattedValue = coupon.tipo === 'percentual'
     ? `${parseFloat(coupon.valor).toFixed(0)}% OFF`
     : `R$ ${parseFloat(coupon.valor).toFixed(2).replace('.', ',')} OFF`;
 
