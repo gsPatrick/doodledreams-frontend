@@ -208,3 +208,54 @@
 
 /* REMOVIDO: Estilos de newsletter que não são mais necessários */
 /* .newsletterForm, .newsletterInput, .newsletterButton {...} */
+
+
+/* src/components/Footer/Footer.module.css */
+
+/* ... (Estilos existentes do footer) ... */
+
+/* --- NOVO: Estilos para a Seção de Segurança --- */
+.footerSecurity {
+  max-width: 1280px;
+  margin: 3rem auto 0 auto;
+  padding: 1.5rem;
+  border-top: 1px solid rgba(144, 122, 204, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap; /* Para responsividade */
+}
+
+.securityItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--doodle-placeholder-text);
+  font-size: 0.9rem;
+}
+
+.securityItem svg {
+  font-size: 1.5rem;
+  color: var(--doodle-purple-soft);
+  flex-shrink: 0;
+}
+
+
+/* --- Barra Inferior --- */
+/* Modificado para ter uma margem menor em relação à nova seção */
+.footerBottomBar {
+  max-width: 1280px;
+  margin: 1.5rem auto 0 auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(144, 122, 204, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--doodle-placeholder-text);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* ... (Resto do CSS existente) ... */

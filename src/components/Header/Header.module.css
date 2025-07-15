@@ -175,3 +175,68 @@
 .menuActionLink { display: flex; align-items: center; gap: 0.75rem; font-family: var(--font-mali-next); font-size: 1.1rem; color: var(--doodle-purple-soft); text-decoration: none; transition: color 0.2s ease; background: none; border: none; padding: 0; cursor: pointer; text-align: left; width: 100%; }
 .menuActionLink:hover { color: var(--doodle-blue-soft); }
 .menuActionIcon { width: 1.5rem; height: 1.5rem; color: var(--doodle-purple-light); }
+
+
+/* src/components/Header/Header.module.css */
+
+/* ... (Estilos existentes) ... */
+
+/* --- ALTERAÇÕES NA TOP BAR --- */
+.topBarContent { 
+  max-width: 1280px; 
+  margin-left: auto; 
+  margin-right: auto; 
+  padding: 0 1.5rem; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  font-size: 0.875rem; 
+}
+
+/* Container para os novos selos de confiança */
+.topBarTrustBadges {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+/* Estilo para cada selo individual */
+.trustBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--doodle-light-text-on-dark);
+  font-family: sans-serif;
+}
+
+/* Remover o container de contato antigo, já que foi substituído */
+.topBarContact { display: none; }
+
+/* Manter os links sociais */
+.topBarSocial { 
+  display: flex; 
+  align-items: center; 
+  gap: 1.5rem; 
+}
+.topBarSocialLink { color: var(--doodle-light-text-on-dark); font-size: 1.2rem; transition: color 0.2s ease; }
+.topBarSocialLink:hover { color: var(--doodle-pink-pastel); }
+
+/* Ajustes de responsividade para os novos selos */
+@media (max-width: 991px) {
+  .topBarTrustBadges {
+    gap: 1rem;
+    justify-content: flex-start; /* Alinha à esquerda em telas menores */
+  }
+  .topBarSocial {
+    display: none; /* Opcional: esconder redes sociais se não houver espaço */
+  }
+}
+
+@media (max-width: 767px) {
+  .topBarWrapper, .navBar, .hideOnMobile { display: none; }
+  /* O resto das regras de mobile permanecem iguais... */
+}
+
+/* ... (O resto do arquivo CSS permanece igual) ... */

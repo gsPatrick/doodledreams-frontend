@@ -1,0 +1,148 @@
+/* src/components/MercadoPagoBanner/MercadoPagoBanner.module.css */
+
+.mercadopagoSection {
+  background-color: var(--doodle-yellow-light); 
+  padding: 3rem 1.5rem; /* Aumentado o padding vertical */
+  border-radius: 24px;
+  margin: 5rem auto; 
+  max-width: 1000px;
+  box-shadow: 0 15px 30px -5px rgba(246, 197, 213, 0.3); /* Sombra mais suave e rosa */
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--doodle-yellow-mustard); /* Borda mais forte */
+}
+
+/* --- NOVO LAYOUT EM DUAS COLUNAS --- */
+.bannerContent {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr; /* Coluna da logo/selos menor que a de info */
+  align-items: center;
+  gap: 3rem; /* Espaço entre as colunas */
+  max-width: 900px; /* Limita a largura do conteúdo interno */
+  margin: 0 auto;
+}
+
+/* --- COLUNA DA ESQUERDA: Logo e Selos --- */
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  justify-content: center; /* Centraliza verticalmente se for curta */
+  height: 100%;
+}
+
+.mercadopagoLogoContainer {
+  background-color: transparent;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.mercadopagoLogo {
+  width: 100%;
+  height: auto;
+  max-width: 180px;
+}
+
+.securityBadges {
+  display: flex;
+  flex-direction: column; /* Empilha os selos */
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.securityBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Espaço entre ícone e texto */
+  font-size: 1rem; /* Fonte dos selos */
+  font-weight: 600;
+  color: var(--doodle-dark-grey);
+}
+
+.securityBadge svg {
+  font-size: 1.5rem; /* Ícone dos selos */
+  color: var(--doodle-purple-soft);
+}
+
+/* --- COLUNA CENTRAL: Informações do Pagamento --- */
+.centerColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Alinha tudo à esquerda na coluna central */
+  gap: 0.75rem;
+}
+
+.title {
+  font-family: var(--font-mali-next);
+  font-size: 2.2rem; /* Título maior */
+  font-weight: 700;
+  color: var(--doodle-dark-grey);
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+.description {
+  font-size: 1.05rem; /* Texto ligeiramente maior */
+  line-height: 1.6;
+  color: var(--doodle-placeholder-text);
+  margin-bottom: 1.5rem; /* Mais espaço antes dos ícones */
+}
+
+.paymentIcons {
+  display: flex;
+  gap: 1.2rem; /* Espaço entre os ícones de pagamento */
+  font-size: 2.5rem; /* Ícones de pagamento maiores */
+  color: var(--doodle-purple-soft);
+}
+
+/* Responsividade */
+@media (max-width: 991px) {
+  .bannerContent {
+    grid-template-columns: 1fr; /* Transforma em coluna única */
+    gap: 2rem;
+  }
+  .leftColumn {
+    margin-bottom: 1.5rem;
+  }
+  .centerColumn {
+    align-items: center; /* Centraliza o conteúdo na coluna única */
+    text-align: center;
+  }
+  .securityBadges {
+    flex-direction: row; /* Mostra os selos lado a lado em telas médias */
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 767px) {
+  .mercadopagoSection {
+    padding: 2.5rem 1rem;
+  }
+  .mercadopagoLogoContainer {
+    padding: 0.8rem 1.5rem;
+  }
+  .title {
+    font-size: 1.8rem;
+  }
+  .description {
+    font-size: 1rem;
+  }
+  .paymentIcons {
+    font-size: 2rem;
+    gap: 1rem;
+  }
+  .securityBadges {
+    flex-direction: column; /* Volta para empilhar em telas menores */
+    gap: 1rem;
+  }
+  .securityBadge {
+    font-size: 1rem;
+  }
+  .securityBadge svg {
+    font-size: 1.5rem;
+  }
+}
