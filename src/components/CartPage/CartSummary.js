@@ -424,3 +424,5 @@ const CartSummary = ({ allUserAddresses, isLoadingAddresses }) => {
 };
 
 export default CartSummary;
+
+//teste
