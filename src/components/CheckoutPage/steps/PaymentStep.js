@@ -5,12 +5,12 @@
 import React, { useState } from 'react';
 import styles from '../CheckoutPage.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BsCreditCard, BsUpcScan, BsFileEarmarkText } from 'react-icons/bs';
+import { BsCreditCard } from 'react-icons/bs';
 import api from '@/services/api';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 
-// Recebe finalShippingMethod, finalUserData, cartItems E finalAppliedCoupon
+// Recebe finalAppliedCoupon
 const PaymentStep = ({ onComplete, onPrev, finalShippingMethod, finalUserData, cartItems, finalAppliedCoupon }) => {
   const [paymentMethod, setPaymentMethod] = useState('mercado_pago');
   const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +31,6 @@ const PaymentStep = ({ onComplete, onPrev, finalShippingMethod, finalUserData, c
     }
 
     try {
-        // 1. Criar o pedido no backend
         const orderPayload = {
              itens: cartItems.map(item => ({
                  produtoId: item.id,
@@ -40,31 +39,28 @@ const PaymentStep = ({ onComplete, onPrev, finalShippingMethod, finalUserData, c
              })),
              freteId: finalShippingMethod.id, 
              enderecoEntrega: finalUserData,
-             // --- NOVO: Adicionar cupomCodigo se aplicável ---
+             // --- APLICAÇÃO REAL DO CUPOM ACONTECE AQUI ---
              cupomCodigo: finalAppliedCoupon ? finalAppliedCoupon.codigo : null, 
-             // --- FIM NOVO ---
         };
 
         const orderResponse = await api.post('/pedidos', orderPayload);
         const newOrder = orderResponse.data;
 
-        // 2. Iniciar o pagamento (Mercado Pago Checkout Pro)
         const paymentResponse = await api.post('/pagamentos/checkout', { 
             pedidoId: newOrder.id 
         });
         const { checkoutUrl, sandboxUrl } = paymentResponse.data;
 
         const redirectUrl = process.env.NODE_ENV === 'production' ? checkoutUrl : sandboxUrl;
-        console.log("Redirecionando para Mercado Pago:", redirectUrl);
-
+        
         clearCart(); 
 
+        // Adiciona um pequeno delay para garantir que o estado do carrinho seja limpo antes do redirecionamento
         setTimeout(() => {
              window.location.href = redirectUrl;
-        }, 100); 
+        }, 150); 
 
     } catch (err) {
-        console.error("Erro ao finalizar compra ou iniciar pagamento:", err.response?.data?.erro || err.message);
         setPaymentError(err.response?.data?.erro || 'Não foi possível finalizar a compra. Tente novamente.');
     } finally {
         setIsLoading(false);
@@ -109,7 +105,7 @@ const PaymentStep = ({ onComplete, onPrev, finalShippingMethod, finalUserData, c
       <div className={styles.stepActions}>
         <button type="button" onClick={onPrev} className={styles.prevButton} disabled={isLoading}>Voltar</button>
         <button type="submit" className={styles.finalizeButton} disabled={isLoading || !paymentMethod}>
-          {isLoading ? 'Processando Pagamento...' : 'Finalizar Compra'}
+          {isLoading ? 'Finalizando...' : 'Finalizar e Pagar'}
         </button>
       </div>
     </form>

@@ -5,17 +5,28 @@
 import React from 'react';
 import Image from 'next/image';
 import styles from './CheckoutPage.module.css';
+import { motion } from 'framer-motion';
 
-// Recebe cartItems, selectedShippingMethod, appliedCoupon E allCartItemsAreDigital
-const OrderSummary = ({ cartItems, selectedShippingMethod, appliedCoupon, allCartItemsAreDigital }) => {
+// Recebe todas as props relacionadas ao cupom
+const OrderSummary = ({
+  cartItems,
+  selectedShippingMethod,
+  allCartItemsAreDigital,
+  couponCode,
+  setCouponCode,
+  appliedCoupon,
+  setAppliedCoupon,
+  couponError,
+  isApplyingCoupon,
+  handleApplyCoupon,
+  isStepOneCompleted
+}) => {
   const subtotal = cartItems.reduce(
     (acc, item) => acc + (item.variation?.price || item.preco || 0) * item.quantity,
     0
   );
 
   const subtotalAfterCoupon = appliedCoupon ? appliedCoupon.novoTotalCalculado : subtotal;
-  
-  // O custo do frete será 0 se for digital, independentemente do selectedShippingMethod
   const shippingCost = allCartItemsAreDigital ? 0 : (selectedShippingMethod ? parseFloat(selectedShippingMethod.price) : 0);
   const total = subtotalAfterCoupon + shippingCost;
 
@@ -29,8 +40,7 @@ const OrderSummary = ({ cartItems, selectedShippingMethod, appliedCoupon, allCar
               <Image 
                  src={item.images?.[0]?.src || item.produto?.imagemUrl || 'https://placehold.co/60x60.png'} 
                  alt={item.name || item.nome} 
-                 width={60} 
-                 height={60} 
+                 width={60} height={60} 
               />
               <span className={styles.summaryItemQuantity}>{item.quantity}</span>
             </div>
@@ -43,6 +53,43 @@ const OrderSummary = ({ cartItems, selectedShippingMethod, appliedCoupon, allCar
           </div>
         ))}
       </div>
+
+      {/* --- SEÇÃO DE CUPOM AGORA ESTÁ AQUI --- */}
+      <div className={styles.couponSection}>
+        <h4>Tem um cupom mágico?</h4>
+        <p className={styles.couponInfo}>
+          {isStepOneCompleted
+            ? 'Adicione seu cupom abaixo para ver o desconto.'
+            : 'Complete o passo de identificação para adicionar um cupom.'}
+        </p>
+        {appliedCoupon ? (
+          <div className={styles.appliedCoupon}>
+            <p>Cupom Aplicado: <strong>{appliedCoupon.codigo}</strong></p>
+            <button onClick={() => { setAppliedCoupon(null); setCouponCode(''); }} className={styles.removeCouponButton}>Remover</button>
+          </div>
+        ) : (
+          <div className={styles.couponInputGroup}>
+            <input
+              type="text"
+              placeholder="Digite seu cupom"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+              className={styles.couponInput}
+              disabled={!isStepOneCompleted || isApplyingCoupon}
+            />
+            <motion.button
+              className={styles.applyCouponButton}
+              onClick={() => handleApplyCoupon(subtotal)}
+              disabled={!isStepOneCompleted || isApplyingCoupon}
+            >
+              {isApplyingCoupon ? 'Verificando...' : 'Aplicar'}
+            </motion.button>
+          </div>
+        )}
+        {couponError && <p className={styles.couponError}>{couponError}</p>}
+      </div>
+      {/* --- FIM DA SEÇÃO DE CUPOM --- */}
+      
       <div className={styles.summaryTotals}>
         <div className={styles.summaryRow}>
           <span>Subtotal</span>
@@ -55,15 +102,7 @@ const OrderSummary = ({ cartItems, selectedShippingMethod, appliedCoupon, allCar
             <span>-R$ {appliedCoupon.descontoCalculado.toFixed(2).replace('.', ',')}</span>
           </div>
         )}
-
-        {appliedCoupon && (
-          <div className={`${styles.summaryRow} ${styles.summarySubtotalWithCoupon}`}>
-            <span>Subtotal (com cupom)</span>
-            <span>R$ {subtotalAfterCoupon.toFixed(2).replace('.', ',')}</span>
-          </div>
-        )}
-
-        {/* NOVO: Exibe "Entrega Digital" ou o frete normal */}
+        
         {allCartItemsAreDigital ? (
           <div className={styles.summaryRow}>
             <span>Frete (Entrega Digital)</span>

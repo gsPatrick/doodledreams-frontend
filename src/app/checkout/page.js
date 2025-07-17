@@ -8,6 +8,7 @@ import Breadcrumb from '@/components/SubscriptionPage/Breadcrumb';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import api from '@/services/api';
 
 import CheckoutSteps from '@/components/CheckoutPage/CheckoutSteps';
 import OrderSummary from '@/components/CheckoutPage/OrderSummary';
@@ -24,12 +25,16 @@ export default function CheckoutPage() {
 
   const [finalUserData, setFinalUserData] = useState(null);
   const [finalShippingMethod, setFinalShippingMethod] = useState(null);
-  const [finalAppliedCoupon, setFinalAppliedCoupon] = useState(null);
+  
+  // --- ESTADO DO CUPOM AGORA VIVE AQUI ---
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponError, setCouponError] = useState('');
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  // ----------------------------------------
 
-  // NOVO: Determina se todos os itens do carrinho são digitais
   const allCartItemsAreDigital = cartItems.every(item => item.variation.digital === true);
 
-  // Redireciona para o carrinho se estiver vazio ou se não houver dados iniciais
   useEffect(() => {
     if (cartItems.length === 0) {
       router.push('/cart');
@@ -43,7 +48,7 @@ export default function CheckoutPage() {
             const parsedData = JSON.parse(storedData);
             setInitialCheckoutData(parsedData);
             setFinalShippingMethod(parsedData.shippingMethod);
-            setFinalAppliedCoupon(parsedData.coupon);
+            // Cupom não vem mais do localStorage
             localStorage.removeItem('checkout_data');
          } catch(error) {
             console.error("Erro ao parsear dados iniciais do checkout:", error);
@@ -53,12 +58,36 @@ export default function CheckoutPage() {
        }
        setHasLoadedInitialData(true);
     }
+  }, [cartItems, router, hasLoadedInitialData]);
 
-    if (hasLoadedInitialData && !initialCheckoutData && cartItems.length > 0) {
-        // router.push('/cart'); 
+  // Função para validar o cupom
+  const handleApplyCoupon = async (subtotal) => {
+    if (!couponCode.trim()) {
+      setCouponError('Por favor, digite um código de cupom.');
+      setAppliedCoupon(null);
+      return;
     }
-
-  }, [cartItems, router, hasLoadedInitialData, initialCheckoutData]);
+    setIsApplyingCoupon(true);
+    setCouponError('');
+    setAppliedCoupon(null);
+    try {
+      const totalItemsQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+      const response = await api.post('/cupons/validar', {
+        codigo: couponCode,
+        total: subtotal,
+        quantidadeItens: totalItemsQuantity,
+      });
+      if (response.data.valido) {
+        setAppliedCoupon(response.data.cupom);
+      } else {
+        setCouponError(response.data.erro || 'Cupom inválido.');
+      }
+    } catch (err) {
+      setCouponError(err.response?.data?.erro || 'Não foi possível aplicar o cupom.');
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
 
 
   const breadcrumbItems = [
@@ -67,7 +96,7 @@ export default function CheckoutPage() {
     { label: 'Finalizar Compra', href: null },
   ];
 
-  if (cartItems.length === 0) {
+  if (cartItems.length === 0 && hasLoadedInitialData) {
     return null; 
   }
 
@@ -89,18 +118,32 @@ export default function CheckoutPage() {
             isAuthenticated={isAuthenticated} 
             isAuthLoading={isAuthLoading} 
             initialCheckoutData={initialCheckoutData}
-            onUserDataComplete={(data) => setFinalUserData(data)}
+            onUserDataComplete={(data) => {
+                setFinalUserData(data);
+                // Quando o passo 1 é completo, reseta o cupom caso o usuário mude
+                setAppliedCoupon(null); 
+                setCouponCode('');
+                setCouponError('');
+            }}
             onShippingComplete={(method) => setFinalShippingMethod(method)}
-            finalAppliedCoupon={finalAppliedCoupon}
-            allCartItemsAreDigital={allCartItemsAreDigital} // NOVO: Passar flag digital
+            finalAppliedCoupon={appliedCoupon} // Passa o cupom aplicado para o passo de pagamento
+            allCartItemsAreDigital={allCartItemsAreDigital}
           />
         </div>
         <div className={styles.summaryColumn}>
           <OrderSummary 
              cartItems={cartItems}
              selectedShippingMethod={finalShippingMethod} 
-             appliedCoupon={finalAppliedCoupon}
-             allCartItemsAreDigital={allCartItemsAreDigital} // NOVO: Passar flag digital
+             allCartItemsAreDigital={allCartItemsAreDigital}
+             // --- PROPS DO CUPOM PASSADAS PARA O RESUMO ---
+             couponCode={couponCode}
+             setCouponCode={setCouponCode}
+             appliedCoupon={appliedCoupon}
+             setAppliedCoupon={setAppliedCoupon}
+             couponError={couponError}
+             isApplyingCoupon={isApplyingCoupon}
+             handleApplyCoupon={handleApplyCoupon}
+             isStepOneCompleted={!!finalUserData} // Desabilita o cupom se o passo 1 não foi concluído
           />
         </div>
       </div>

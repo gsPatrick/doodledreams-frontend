@@ -294,4 +294,80 @@
     margin-bottom: 0; /* Remove margem inferior */
 }
 
-/* ... (o restante dos seus estilos) ... */
+/* src/components/CheckoutPage/CheckoutPage.module.css */
+
+/* ... todos os seus estilos existentes ... */
+
+/* --- ESTILOS PARA A SEÇÃO DE CUPOM NO CHECKOUT --- */
+.couponSection {
+  padding: 1rem 0;
+  margin: 1rem 0;
+  border-top: 1px solid var(--doodle-input-border);
+  border-bottom: 1px solid var(--doodle-input-border);
+}
+.couponSection h4 {
+  font-family: var(--font-mali-next);
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+.couponInfo {
+  font-size: 0.85rem;
+  color: var(--doodle-placeholder-text);
+  margin-bottom: 1rem;
+}
+.couponInputGroup {
+  display: flex;
+  gap: 0.5rem;
+}
+.couponInput {
+  flex-grow: 1;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--doodle-input-border);
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+.couponInput:disabled {
+  background-color: #f8f8f8;
+  cursor: not-allowed;
+}
+.applyCouponButton {
+  padding: 0 1.5rem;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--doodle-blue-soft);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.applyCouponButton:disabled {
+  background-color: var(--doodle-placeholder-text);
+  cursor: not-allowed;
+}
+.couponError {
+  color: #d9466b;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+.appliedCoupon {
+  background-color: #e0f8e4;
+  color: #1e6a25;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.appliedCoupon p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.removeCouponButton {
+  background: none;
+  border: none;
+  color: #1e6a25;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 700;
+}
