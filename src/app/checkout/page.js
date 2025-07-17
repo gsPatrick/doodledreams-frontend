@@ -48,7 +48,6 @@ export default function CheckoutPage() {
             const parsedData = JSON.parse(storedData);
             setInitialCheckoutData(parsedData);
             setFinalShippingMethod(parsedData.shippingMethod);
-            // Cupom não vem mais do localStorage
             localStorage.removeItem('checkout_data');
          } catch(error) {
             console.error("Erro ao parsear dados iniciais do checkout:", error);
@@ -60,7 +59,7 @@ export default function CheckoutPage() {
     }
   }, [cartItems, router, hasLoadedInitialData]);
 
-  // Função para validar o cupom
+  // Função para validar o cupom (não aplica, apenas verifica)
   const handleApplyCoupon = async (subtotal) => {
     if (!couponCode.trim()) {
       setCouponError('Por favor, digite um código de cupom.');
@@ -88,7 +87,6 @@ export default function CheckoutPage() {
       setIsApplyingCoupon(false);
     }
   };
-
 
   const breadcrumbItems = [
     { label: 'Home', href: '/' },
@@ -120,13 +118,13 @@ export default function CheckoutPage() {
             initialCheckoutData={initialCheckoutData}
             onUserDataComplete={(data) => {
                 setFinalUserData(data);
-                // Quando o passo 1 é completo, reseta o cupom caso o usuário mude
+                // Reseta o cupom se o usuário for alterado, forçando nova validação
                 setAppliedCoupon(null); 
                 setCouponCode('');
                 setCouponError('');
             }}
             onShippingComplete={(method) => setFinalShippingMethod(method)}
-            finalAppliedCoupon={appliedCoupon} // Passa o cupom aplicado para o passo de pagamento
+            finalAppliedCoupon={appliedCoupon} // Passa o cupom validado para o passo de pagamento
             allCartItemsAreDigital={allCartItemsAreDigital}
           />
         </div>
