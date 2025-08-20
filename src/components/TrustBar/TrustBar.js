@@ -11,7 +11,7 @@ const trustData = [
   { 
     id: 'clients',
     icon: <BsPeople />, 
-    text: "+50 Pessoas", 
+    text: "+50000 Pessoas", 
     subtext: "Já coloriram seus sonhos" 
   },
   { 
